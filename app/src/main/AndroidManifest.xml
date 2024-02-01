@@ -9,22 +9,24 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.ProjeManaj"
-        tools:targetApi="31">
+        android:theme="@style/Theme.ProjeManaj">
+        <activity
+            android:name=".IntroActivity"
+            android:exported="false"
+            android:screenOrientation="fullSensor"
+            android:theme="@style/Theme.ProjeManaj.NoActionBar"/>
         <activity
             android:name=".SplashActivity"
+            android:exported="true"
             android:screenOrientation="fullSensor"
-            android:theme="@style/Theme.ProjeManaj.NoActionBar"
-            android:exported="true">
+            android:theme="@style/Theme.ProjeManaj.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".MainActivity">
-        </activity>
+        <activity android:name=".MainActivity" />
     </application>
 
 </manifest>
