@@ -16,12 +16,18 @@ class IntroActivity : AppCompatActivity() {
             WindowManager.LayoutParams.FLAG_FULLSCREEN
         )
 
-        // START
-        val btn : Button = findViewById<Button>(R.id.btn_sign_up_intro)
-        btn.setOnClickListener {
+
+        val btn_sign_up : Button = findViewById<Button>(R.id.btn_sign_up_intro)
+        btn_sign_up.setOnClickListener {
             // Launch the sign up screen.
             startActivity(Intent(this@IntroActivity, SignUpActivity::class.java))
         }
-        // END
+
+        val btn_sign_in : Button = findViewById<Button>(R.id.btn_sign_in_intro)
+        btn_sign_in.setOnClickListener {
+            // Launch the sign in screen.
+            startActivity(Intent(this@IntroActivity, SignInActivity::class.java))
+        }
+
     }
 }
