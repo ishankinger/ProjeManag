@@ -8,8 +8,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/intro_background"
     android:gravity="center_horizontal"
-    android:orientation="vertical"
-    tools:context=".IntroActivity">
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/tv_app_name_intro"
@@ -58,6 +57,7 @@
         android:layout_marginTop="@dimen/intro_screen_sign_in_btn_marginTop"
         android:layout_marginEnd="@dimen/btn_marginStartEnd"
         android:background="@drawable/shape_button_rounded"
+        android:backgroundTint="@null"
         android:gravity="center"
         android:paddingTop="@dimen/btn_paddingTopBottom"
         android:paddingBottom="@dimen/btn_paddingTopBottom"
@@ -74,6 +74,7 @@
         android:layout_marginTop="@dimen/intro_screen_sign_up_btn_marginTop"
         android:layout_marginEnd="@dimen/btn_marginStartEnd"
         android:background="@drawable/white_button_shape_rounded"
+        android:backgroundTint="@null"
         android:gravity="center"
         android:paddingTop="@dimen/btn_paddingTopBottom"
         android:paddingBottom="@dimen/btn_paddingTopBottom"

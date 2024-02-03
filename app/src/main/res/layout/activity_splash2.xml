@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/skyBlue"
-    tools:context=".SplashActivity">
+    android:background="@drawable/shape_button_rounded">
 
     <TextView
         android:id="@+id/splashTitle"
@@ -30,6 +29,7 @@
         android:layout_height="69dp"
         android:layout_marginStart="92dp"
         android:layout_marginTop="112dp"
+        android:background="@drawable/white_button_shape_rounded"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/splashTitle"
         app:srcCompat="@drawable/baseline_manage_history_24" />
@@ -39,6 +39,7 @@
         android:layout_width="60dp"
         android:layout_height="66dp"
         android:layout_marginTop="124dp"
+        android:background="@drawable/white_button_shape_rounded"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.535"
         app:layout_constraintStart_toEndOf="@+id/imageView"
@@ -51,6 +52,7 @@
         android:layout_height="70dp"
         android:layout_marginStart="92dp"
         android:layout_marginBottom="104dp"
+        android:background="@drawable/white_button_shape_rounded"
         app:layout_constraintBottom_toBottomOf="@+id/splashTitle"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/baseline_ondemand_video_24" />
@@ -60,6 +62,7 @@
         android:layout_width="62dp"
         android:layout_height="58dp"
         android:layout_marginBottom="116dp"
+        android:background="@drawable/white_button_shape_rounded"
         app:layout_constraintBottom_toBottomOf="@+id/splashTitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.528"
