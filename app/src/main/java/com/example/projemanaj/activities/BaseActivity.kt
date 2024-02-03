@@ -26,8 +26,8 @@ open class BaseActivity : AppCompatActivity() {
         // set the screen content from a layout resource
         // the resource will be inflated, adding all top-level views to the screen
         mProgressDialog.setContentView(R.layout.dialog_progress)
-        val progressText : TextView = findViewById(R.id.tv_progress_text)
-        progressText.text = text
+//        val progressText : TextView = findViewById(R.id.tv_progress_text)
+//        progressText.text = text
         // start dialog and display it on the screen
         mProgressDialog.show()
     }

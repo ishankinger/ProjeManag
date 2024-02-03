@@ -11,25 +11,25 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ProjeManaj">
         <activity
-            android:name=".BaseActivity"
+            android:name="com.example.projemanaj.activities.BaseActivity"
             android:exported="false" />
         <activity
-            android:name=".SignInActivity"
+            android:name="com.example.projemanaj.activities.SignInActivity"
             android:exported="false"
             android:screenOrientation="fullSensor"
             android:theme="@style/Theme.ProjeManaj.NoActionBar" />
         <activity
-            android:name=".SignUpActivity"
+            android:name="com.example.projemanaj.activities.SignUpActivity"
             android:exported="false"
             android:screenOrientation="fullSensor"
             android:theme="@style/Theme.ProjeManaj.NoActionBar" />
         <activity
-            android:name=".IntroActivity"
+            android:name="com.example.projemanaj.activities.IntroActivity"
             android:exported="false"
             android:screenOrientation="fullSensor"
             android:theme="@style/Theme.ProjeManaj.NoActionBar" />
         <activity
-            android:name=".SplashActivity"
+            android:name="com.example.projemanaj.activities.SplashActivity"
             android:exported="true"
             android:screenOrientation="fullSensor"
             android:theme="@style/Theme.ProjeManaj.NoActionBar">
@@ -39,7 +39,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" />
+        <activity android:name="com.example.projemanaj.activities.MainActivity" />
     </application>
 
 </manifest>
