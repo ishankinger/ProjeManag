@@ -39,11 +39,20 @@ class SignUpActivity : BaseActivity() {
     }
 
     private fun registerUser(){
-        val name : String = findViewById<TextView>(R.id.et_name).text.toString().trim{it <= ' '}
-        val email : String = findViewById<TextView>(R.id.et_email).text.toString().trim{it <= ' '}
-        val password : String = findViewById<TextView>(R.id.et_password).text.toString().trim{it <= ' '}
+        val name : String = findViewById<TextView>(R.id.et_name_up).text.toString().trim{it <= ' '}
+        val email : String = findViewById<TextView>(R.id.et_email_up).text.toString().trim{it <= ' '}
+        val password : String = findViewById<TextView>(R.id.et_password_up).text.toString().trim{it <= ' '}
 
         if(validateForm(name,email,password)){
+            if(password.length <= 6){
+                showErrorSnackBar("Password must be of atleast 6 characters")
+                return
+            }
+            var len = email.length
+            if(email[len-1] != 'm' && email[len-2] != 'o' && email[len-3] != 'c' && email[len-4] != '.'){
+                showErrorSnackBar("Email is not formatted properly")
+                return
+            }
             showProgressDialog(resources.getString(R.string.please_wait))
             FirebaseAuth.getInstance()
                 .createUserWithEmailAndPassword(email,password)
@@ -54,16 +63,12 @@ class SignUpActivity : BaseActivity() {
                         val registeredEmail = firebaseUser.email!!
                         Toast.makeText(
                             this@SignUpActivity,
-                            "$name you have successfully registered the eamil address $registeredEmail",
+                            "$name you have successfully registered the email address $registeredEmail",
                             Toast.LENGTH_LONG
                         ).show()
                         finish()
                     } else {
-                        Toast.makeText(
-                            this@SignUpActivity,
-                            task.exception!!.message,
-                            Toast.LENGTH_LONG
-                        )
+                        showErrorSnackBar("Error occurs")
                     }
                 }
         }
@@ -76,7 +81,7 @@ class SignUpActivity : BaseActivity() {
                 false
             }
             TextUtils.isEmpty(email)->{
-                showErrorSnackBar("Please enter a email")
+                showErrorSnackBar("Please enter an email")
                 false
             }
             TextUtils.isEmpty(password)->{
