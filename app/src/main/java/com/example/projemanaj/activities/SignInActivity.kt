@@ -7,8 +7,11 @@ import android.text.TextUtils
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import com.example.projemanaj.R
+import com.example.projemanaj.firebase.FirestoreClass
+import com.example.projemanaj.models.User
 import com.google.firebase.auth.FirebaseAuth
 
 class SignInActivity : BaseActivity() {
@@ -41,6 +44,17 @@ class SignInActivity : BaseActivity() {
         toolbar.setNavigationOnClickListener { onBackPressed() }
     }
 
+    fun signInSuccess(user : User){
+        hideProgressDialog()
+        Toast.makeText(
+            this,
+            "Hi ${user.name}, Welcome to ProjeManag",
+            Toast.LENGTH_LONG
+        ).show()
+        startActivity(Intent(this,MainActivity::class.java))
+        finish() // (user can't get back to this activity after navigating)
+    }
+
     private fun signInRegisteredUser(){
         val email : String = findViewById<TextView>(R.id.et_email_in).text.toString().trim{it <= ' '}
         val password : String = findViewById<TextView>(R.id.et_password_in).text.toString().trim{it <= ' '}
@@ -48,10 +62,11 @@ class SignInActivity : BaseActivity() {
             showProgressDialog(resources.getString(R.string.please_wait))
             auth.signInWithEmailAndPassword(email,password)
                 .addOnCompleteListener(this){task->
-                    hideProgressDialog()
+//                    hideProgressDialog()
                     if(task.isSuccessful){
-                        val user = auth.currentUser
-                        startActivity(Intent(this,MainActivity::class.java))
+//                        val user = auth.currentUser
+//                        startActivity(Intent(this,MainActivity::class.java))
+                        FirestoreClass().signInRegisteredUser(this)
                     }
                     else{
                         showErrorSnackBar("Authentication failed")
