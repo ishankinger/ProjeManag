@@ -9,6 +9,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import com.example.projemanaj.R
+import com.example.projemanaj.firebase.FirestoreClass
+import com.example.projemanaj.models.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 
@@ -23,6 +25,7 @@ class SignUpActivity : BaseActivity() {
         )
 
         setupActionBar()
+
         findViewById<Button>(R.id.btn_sign_up).setOnClickListener{
             registerUser()
         }
@@ -36,6 +39,16 @@ class SignUpActivity : BaseActivity() {
             actionBar.setHomeAsUpIndicator(R.drawable.baseline_arrow_back_ios_24)
         }
         toolbar.setNavigationOnClickListener { onBackPressed() }
+    }
+
+    fun userRegisteredSuccess(){
+        Toast.makeText(
+            this@SignUpActivity,
+            "you have successfully registered the email address",
+            Toast.LENGTH_LONG
+        ).show()
+        hideProgressDialog()
+        finish()
     }
 
     private fun registerUser(){
@@ -57,16 +70,18 @@ class SignUpActivity : BaseActivity() {
             FirebaseAuth.getInstance()
                 .createUserWithEmailAndPassword(email,password)
                 .addOnCompleteListener { task ->
-                    hideProgressDialog()
+
                     if (task.isSuccessful) {
                         val firebaseUser: FirebaseUser = task.result!!.user!!
                         val registeredEmail = firebaseUser.email!!
-                        Toast.makeText(
-                            this@SignUpActivity,
-                            "$name you have successfully registered the email address $registeredEmail",
-                            Toast.LENGTH_LONG
-                        ).show()
-                        finish()
+//                        Toast.makeText(
+//                            this@SignUpActivity,
+//                            "$name you have successfully registered the email address $registeredEmail",
+//                            Toast.LENGTH_LONG
+//                        ).show()
+                        val user = User(firebaseUser.uid,name,registeredEmail)
+                        FirestoreClass().registerUser(this,user)
+
                     } else {
                         showErrorSnackBar("Error occurs")
                     }

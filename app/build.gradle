@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'com.google.gms.google-services'
+    id 'kotlin-parcelize'
 }
 
 android {
@@ -49,4 +50,5 @@ dependencies {
     // firebase implementations
     implementation 'com.google.firebase:firebase-auth:22.3.1'
     implementation("com.google.firebase:firebase-analytics:21.5.0")
+    implementation("com.google.firebase:firebase-firestore:24.10.1")
 }
