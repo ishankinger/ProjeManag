@@ -5,10 +5,11 @@ import com.example.projemanaj.activities.SignInActivity
 import com.example.projemanaj.activities.SignUpActivity
 import com.example.projemanaj.models.User
 import com.example.projemanaj.utils.Constants
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 
-class FirestoreClass : BaseActivity() {
+class FirestoreClass {
 
     private val mFireStore = FirebaseFirestore.getInstance()
 
@@ -33,5 +34,14 @@ class FirestoreClass : BaseActivity() {
                 val loggedInUser = it.toObject(User::class.java)!!
                 activity.signInSuccess(loggedInUser)
             }
+    }
+
+    fun getCurrentUserID(): String{
+        var currentUser = FirebaseAuth.getInstance().currentUser
+        var currentUserId = ""
+        if(currentUser != null){
+            currentUserId = currentUser.uid
+        }
+        return currentUserId
     }
 }

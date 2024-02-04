@@ -36,10 +36,6 @@ open class BaseActivity : AppCompatActivity() {
         mProgressDialog.dismiss()
     }
 
-    fun getCurrentUserID(): String{
-        return FirebaseAuth.getInstance().currentUser!!.uid
-    }
-
     fun doubleBackToExit(){
         // when variable true then backPressed this true will occur before second click
         if(doubleBackToExitPressedOnce) {

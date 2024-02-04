@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.WindowManager
 import com.example.projemanaj.R
+import com.example.projemanaj.firebase.FirestoreClass
 
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : BaseActivity() {
@@ -22,7 +23,13 @@ class SplashActivity : BaseActivity() {
 
         // Navigation from splash Activity to intro Activity after a certain period of time
         Handler().postDelayed({
-            startActivity(Intent(this,IntroActivity::class.java))
+            var currentUserId = FirestoreClass().getCurrentUserID()
+            if(currentUserId.isNotEmpty()){
+                startActivity(Intent(this,MainActivity::class.java))
+            }
+            else{
+                startActivity(Intent(this,IntroActivity::class.java))
+            }
             // this finish function help user not come back to splash Activity after pressing back button
             finish()
         },2500)
