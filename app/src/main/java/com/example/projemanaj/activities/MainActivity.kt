@@ -6,11 +6,16 @@ import android.os.Bundle
 import android.os.Handler
 import android.text.Layout
 import android.view.MenuItem
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import com.bumptech.glide.Glide
 import com.example.projemanaj.R
+import com.example.projemanaj.firebase.FirestoreClass
+import com.example.projemanaj.models.User
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 
@@ -22,6 +27,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         setContentView(R.layout.activity_main)
         setupActionBar()
         findViewById<NavigationView>(R.id.nav_view).setNavigationItemSelectedListener(this)
+        FirestoreClass().signInRegisteredUser(this@MainActivity)
     }
     private fun setupActionBar(){
         val toolbar : Toolbar = findViewById(R.id.toolbar_main_activity)
@@ -43,7 +49,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     override fun onBackPressed(){
-        super.onBackPressed()
         if(findViewById<DrawerLayout>(R.id.drawer_layout).isDrawerOpen(GravityCompat.START)){
             findViewById<DrawerLayout>(R.id.drawer_layout).closeDrawer(GravityCompat.START)
         }
@@ -72,10 +77,22 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             val intent = Intent(this,IntroActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
+            findViewById<DrawerLayout>(R.id.drawer_layout).closeDrawer(GravityCompat.START)
             return
         }
         doubleBackToSignOutPressedOnce = true
         showErrorSnackBar("Sure You want to Exit then Double Press")
         Handler().postDelayed({doubleBackToSignOutPressedOnce = false},4000)
+    }
+
+    fun updateNavigationUserDetails(user : User){
+        Glide.with(this)
+            .load(user.image)
+            .centerCrop()
+            .circleCrop()
+            .placeholder(R.drawable.ic_user_place_holder)
+            .into(findViewById(R.id.nav_user_image))
+
+        findViewById<TextView>(R.id.nav_username).text = user.name
     }
 }

@@ -1,6 +1,8 @@
 package com.example.projemanaj.firebase
 
+import android.app.Activity
 import com.example.projemanaj.activities.BaseActivity
+import com.example.projemanaj.activities.MainActivity
 import com.example.projemanaj.activities.SignInActivity
 import com.example.projemanaj.activities.SignUpActivity
 import com.example.projemanaj.models.User
@@ -26,13 +28,20 @@ class FirestoreClass {
             }
     }
 
-    fun signInRegisteredUser(activity : SignInActivity){
+    fun signInRegisteredUser(activity : Activity){
         mFireStore.collection(Constants.USERS)
             .document(getCurrentUserID())
             .get()
             .addOnSuccessListener {
                 val loggedInUser = it.toObject(User::class.java)!!
-                activity.signInSuccess(loggedInUser)
+                when(activity){
+                    is SignInActivity ->{
+                        activity.signInSuccess(loggedInUser)
+                    }
+                    is MainActivity ->{
+                        activity.updateNavigationUserDetails(loggedInUser)
+                    }
+                }
             }
     }
 

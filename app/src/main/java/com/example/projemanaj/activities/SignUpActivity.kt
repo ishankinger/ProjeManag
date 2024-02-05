@@ -1,5 +1,6 @@
 package com.example.projemanaj.activities
 
+import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
@@ -51,6 +52,7 @@ class SignUpActivity : BaseActivity() {
         finish()
     }
 
+    @SuppressLint("CutPasteId")
     private fun registerUser(){
         val name : String = findViewById<TextView>(R.id.et_name_up).text.toString().trim{it <= ' '}
         val email : String = findViewById<TextView>(R.id.et_email_up).text.toString().trim{it <= ' '}
@@ -62,6 +64,10 @@ class SignUpActivity : BaseActivity() {
                 return
             }
             var len = email.length
+            if(len <= 4){
+                showErrorSnackBar("Email is not formatted properly")
+                return
+            }
             if(email[len-1] != 'm' && email[len-2] != 'o' && email[len-3] != 'c' && email[len-4] != '.'){
                 showErrorSnackBar("Email is not formatted properly")
                 return
@@ -83,7 +89,12 @@ class SignUpActivity : BaseActivity() {
                         FirestoreClass().registerUser(this,user)
 
                     } else {
-                        showErrorSnackBar("Error occurs")
+                        // if sign up fails then hide Progress dialog and make text empty
+                        hideProgressDialog()
+                        findViewById<TextView>(R.id.et_name_up).text = ""
+                        findViewById<TextView>(R.id.et_email_up).text = ""
+                        findViewById<TextView>(R.id.et_password_up).text = ""
+                        showErrorSnackBar("Error occurs Email already exists")
                     }
                 }
         }

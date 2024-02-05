@@ -1,5 +1,6 @@
 package com.example.projemanaj.activities
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -51,10 +52,12 @@ class SignInActivity : BaseActivity() {
             "Hi ${user.name}, Welcome to ProjeManag",
             Toast.LENGTH_LONG
         ).show()
-        startActivity(Intent(this,MainActivity::class.java))
-        finish() // (user can't get back to this activity after navigating)
+        val intent = Intent(this,MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK // remove all backstack activities
+        startActivity(intent)
     }
 
+    @SuppressLint("CutPasteId")
     private fun signInRegisteredUser(){
         val email : String = findViewById<TextView>(R.id.et_email_in).text.toString().trim{it <= ' '}
         val password : String = findViewById<TextView>(R.id.et_password_in).text.toString().trim{it <= ' '}
@@ -69,7 +72,11 @@ class SignInActivity : BaseActivity() {
                         FirestoreClass().signInRegisteredUser(this)
                     }
                     else{
-                        showErrorSnackBar("Authentication failed")
+                        // if sign in fails then hide Progress dialog and make text empty
+                        hideProgressDialog()
+                        findViewById<TextView>(R.id.et_email_in).text = ""
+                        findViewById<TextView>(R.id.et_password_in).text = ""
+                        showErrorSnackBar("Authentication failed no such id found")
                     }
                 }
 
