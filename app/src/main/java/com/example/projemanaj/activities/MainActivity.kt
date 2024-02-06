@@ -10,6 +10,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
+import androidx.core.os.postDelayed
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.bumptech.glide.Glide
@@ -64,8 +65,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 doubleBackToSignOut()
             }
             R.id.nav_my_profile ->{
-                Toast.makeText(this, "Profile was clicked", Toast.LENGTH_LONG).show()
+                val intent = Intent(this,MyProfileActivity::class.java)
                 findViewById<DrawerLayout>(R.id.drawer_layout).closeDrawer(GravityCompat.START)
+                Handler().postDelayed({startActivity(intent)},250)
             }
         }
         return true
@@ -75,9 +77,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         if(doubleBackToSignOutPressedOnce) {
             FirebaseAuth.getInstance().signOut()
             val intent = Intent(this,IntroActivity::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-            startActivity(intent)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             findViewById<DrawerLayout>(R.id.drawer_layout).closeDrawer(GravityCompat.START)
+            Handler().postDelayed({startActivity(intent)},250)
             return
         }
         doubleBackToSignOutPressedOnce = true

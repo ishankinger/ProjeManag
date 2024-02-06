@@ -1,10 +1,7 @@
 package com.example.projemanaj.firebase
 
 import android.app.Activity
-import com.example.projemanaj.activities.BaseActivity
-import com.example.projemanaj.activities.MainActivity
-import com.example.projemanaj.activities.SignInActivity
-import com.example.projemanaj.activities.SignUpActivity
+import com.example.projemanaj.activities.*
 import com.example.projemanaj.models.User
 import com.example.projemanaj.utils.Constants
 import com.google.firebase.auth.FirebaseAuth
@@ -40,6 +37,9 @@ class FirestoreClass {
                     }
                     is MainActivity ->{
                         activity.updateNavigationUserDetails(loggedInUser)
+                    }
+                    is MyProfileActivity ->{
+                        activity.updateMyProfileUserDetails(loggedInUser)
                     }
                 }
             }

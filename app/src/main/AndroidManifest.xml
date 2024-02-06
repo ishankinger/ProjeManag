@@ -11,6 +11,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ProjeManaj">
         <activity
+            android:name="com.example.projemanaj.activities.MyProfileActivity"
+            android:exported="false"
+            android:screenOrientation="fullSensor"
+            android:theme="@style/Theme.ProjeManaj.NoActionBar"/>
+        <activity
             android:name="com.example.projemanaj.activities.BaseActivity"
             android:exported="false" />
         <activity
@@ -39,11 +44,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name="com.example.projemanaj.activities.MainActivity"
+        <activity
+            android:name="com.example.projemanaj.activities.MainActivity"
+            android:exported="false"
             android:screenOrientation="fullSensor"
-            android:theme="@style/Theme.ProjeManaj.NoActionBar">
-        </activity>
+            android:theme="@style/Theme.ProjeManaj.NoActionBar"/>
     </application>
 
 </manifest>

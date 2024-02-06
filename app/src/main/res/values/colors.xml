@@ -15,4 +15,5 @@
     <color name="colorPrimaryDark">#0591F8</color>
     <color name="colorAccent">#0C90F1</color>
     <color name="snackbar_error_color">#F72400</color>
+    <color name="grey">#808080</color>
 </resources>
