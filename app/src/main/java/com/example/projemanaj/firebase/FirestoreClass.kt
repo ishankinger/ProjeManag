@@ -1,6 +1,8 @@
 package com.example.projemanaj.firebase
 
 import android.app.Activity
+import android.util.Log
+import android.widget.Toast
 import com.example.projemanaj.activities.*
 import com.example.projemanaj.models.User
 import com.example.projemanaj.utils.Constants
@@ -42,6 +44,20 @@ class FirestoreClass {
                         activity.updateMyProfileUserDetails(loggedInUser)
                     }
                 }
+            }
+    }
+
+    fun updateUserProfileData(activity: MyProfileActivity, userHashMap : HashMap<String,Any>){
+        mFireStore.collection(Constants.USERS)
+            .document(getCurrentUserID())
+            .update(userHashMap)
+            .addOnSuccessListener{
+                Toast.makeText(activity,"Profile updated successfully!", Toast.LENGTH_LONG).show()
+                activity.profileUpdateSuccess()
+            }
+            .addOnFailureListener { e ->
+                activity.hideProgressDialog()
+                Toast.makeText(activity,"Profile not updated ", Toast.LENGTH_LONG).show()
             }
     }
 

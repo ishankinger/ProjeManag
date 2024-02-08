@@ -23,6 +23,7 @@ import com.bumptech.glide.Glide
 import com.example.projemanaj.R
 import com.example.projemanaj.firebase.FirestoreClass
 import com.example.projemanaj.models.User
+import com.example.projemanaj.utils.Constants
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import java.io.IOException
@@ -36,6 +37,7 @@ class MyProfileActivity : BaseActivity() {
 
     private var mSelectedImageFileUri : Uri? = null
     private var mProfileImageURL : String = ""
+    private lateinit var mUserDetails : User
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_my_profile)
@@ -59,9 +61,12 @@ class MyProfileActivity : BaseActivity() {
             if(mSelectedImageFileUri != null){
                 uploadUserImage()
             }
+            else{
+                showProgressDialog(resources.getString(R.string.please_wait))
+                updateUserProfileData()
+            }
         }
     }
-
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -119,6 +124,9 @@ class MyProfileActivity : BaseActivity() {
     }
 
     fun updateMyProfileUserDetails(user : User){
+
+        mUserDetails = user
+
         Glide.with(this)
             .load(user.image)
             .centerCrop()
@@ -145,18 +153,17 @@ class MyProfileActivity : BaseActivity() {
                     "Firebase Image Url",
                 it.metadata!!.reference!!.downloadUrl.toString()
                 )
-                Toast.makeText(
-                    this,
-                    "file upload to storage",
-                    Toast.LENGTH_LONG
-                ).show()
-                hideProgressDialog()
+//                Toast.makeText(
+//                    this,
+//                    "file upload to storage",
+//                    Toast.LENGTH_SHORT
+//                ).show()
+//                hideProgressDialog()
                 it.metadata!!.reference!!.downloadUrl.addOnSuccessListener {
-                    Log.i("Downloadable Image URL", it.toString())
+                    // file copied to local
                     mProfileImageURL = it.toString()
+                    updateUserProfileData()
                 }
-
-                // TODO UPDATE PROFILE LIVE DATA
 
             }.addOnFailureListener{
                 exception->
@@ -172,5 +179,34 @@ class MyProfileActivity : BaseActivity() {
     private fun getFileExtension(uri : Uri?) : String?{
         return MimeTypeMap.getSingleton()
             .getExtensionFromMimeType(contentResolver.getType(uri!!))
+    }
+
+    fun profileUpdateSuccess(){
+        hideProgressDialog()
+        finish()
+    }
+
+    private fun updateUserProfileData() {
+        val userHashMap: HashMap<String,Any> = HashMap()
+        var anyChangesMade = false
+        if (mProfileImageURL.isNotEmpty() && mProfileImageURL != mUserDetails.image) {
+            anyChangesMade = true
+            userHashMap[Constants.IMAGE] = mProfileImageURL
+        }
+        if (findViewById<TextView>(R.id.update_name).text.toString() != mUserDetails.name.toString()) {
+            anyChangesMade = true
+            userHashMap[Constants.NAME] = findViewById<TextView>(R.id.update_name).text.toString()
+        }
+        if (findViewById<TextView>(R.id.update_mobile).text.toString() != mUserDetails.mobile.toString()) {
+            anyChangesMade = true
+            userHashMap[Constants.MOBILE] =
+                findViewById<TextView>(R.id.update_mobile).text.toString().toLong()
+        }
+        if (anyChangesMade) {
+            FirestoreClass().updateUserProfileData(this, userHashMap)
+        }
+        else{
+            hideProgressDialog()
+        }
     }
 }
