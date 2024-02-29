@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.text.Layout
 import android.view.MenuItem
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -18,6 +19,7 @@ import com.bumptech.glide.Glide
 import com.example.projemanaj.R
 import com.example.projemanaj.firebase.FirestoreClass
 import com.example.projemanaj.models.User
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 
@@ -44,6 +46,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         // when main activity is created then we will call this function of firestroe class
         // this function will help in updating the data in nav drawer that is our name and image
         FirestoreClass().signInRegisteredUser(this@MainActivity)
+
+        findViewById<FloatingActionButton>(R.id.fab_create_board).setOnClickListener{
+            startActivity(Intent(this@MainActivity, CreateBoardActivity::class.java))
+        }
     }
 
     // This function will set up action bar and also contain the button to toggle the navDrawer

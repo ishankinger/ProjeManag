@@ -30,12 +30,6 @@ import java.io.IOException
 
 class MyProfileActivity : BaseActivity() {
 
-    // companion object used in the permission request for choosing image from device
-    companion object{
-        private const val READ_STORAGE_PERMISSION_CODE = 1
-        private const val PICK_IMAGE_REQUEST_CODE = 2
-    }
-
     // variable storing the uri of the selected image
     private var mSelectedImageFileUri : Uri? = null
 
@@ -64,14 +58,14 @@ class MyProfileActivity : BaseActivity() {
             if(ContextCompat.checkSelfPermission(
                     this, Manifest.permission.READ_EXTERNAL_STORAGE)
                                     == PackageManager.PERMISSION_GRANTED){
-                showImageChooser()
+                Constants.showImageChooser(this@MyProfileActivity)
 
             // else we will ask for the request to the user, generic code for asking permission
             }else{
                 ActivityCompat.requestPermissions(
                     this,
                     arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                    READ_STORAGE_PERMISSION_CODE
+                    Constants.READ_STORAGE_PERMISSION_CODE
                 )
             }
         }
@@ -135,10 +129,10 @@ class MyProfileActivity : BaseActivity() {
     ){
         // this is the generic code for getting permission result
         super.onRequestPermissionsResult(requestCode,permissions,grantResults)
-        if(requestCode == READ_STORAGE_PERMISSION_CODE){
+        if(requestCode == Constants.READ_STORAGE_PERMISSION_CODE){
             // if we get the permission then we can call show image chooser function
             if(grantResults.isNotEmpty()){
-                showImageChooser()
+                Constants.showImageChooser(this@MyProfileActivity)
 
             // else we will give a toast saying permission denied
             }else{
@@ -151,19 +145,11 @@ class MyProfileActivity : BaseActivity() {
         }
     }
 
-    // Function to choose image from our device after permission is granted
-    private fun showImageChooser(){
-        // generic code
-        var galleryIntent = Intent(Intent.ACTION_PICK,
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        startActivityForResult(galleryIntent, PICK_IMAGE_REQUEST_CODE)
-    }
-
     // Generic code for updating the image on the image view after choosing image from device
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if(resultCode == Activity.RESULT_OK
-            && requestCode == PICK_IMAGE_REQUEST_CODE
+            && requestCode == Constants.PICK_IMAGE_REQUEST_CODE
             && data!!.data != null){
             mSelectedImageFileUri = data.data
             try{
@@ -193,7 +179,7 @@ class MyProfileActivity : BaseActivity() {
                 FirebaseStorage.getInstance().reference
                         // getFileExtension used here
                     .child("UESER_IMAGE" + System.currentTimeMillis()
-                            + "." + getFileExtension(mSelectedImageFileUri))
+                            + "." + Constants.getFileExtension(mSelectedImageFileUri,this@MyProfileActivity))
 
             // Put the file in storage and then work on it's success and failuire listener
             sRef.putFile(mSelectedImageFileUri!!)
@@ -226,13 +212,6 @@ class MyProfileActivity : BaseActivity() {
                 }
         }
     }
-
-    // used in upload User image function to give it a name
-    private fun getFileExtension(uri : Uri?) : String?{
-        return MimeTypeMap.getSingleton()
-            .getExtensionFromMimeType(contentResolver.getType(uri!!))
-    }
-
 
     // last function called when all update process is overed
     fun profileUpdateSuccess(){
