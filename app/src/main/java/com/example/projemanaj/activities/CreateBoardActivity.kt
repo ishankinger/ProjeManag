@@ -7,21 +7,32 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.WindowManager
+import android.widget.Button
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.example.projemanaj.R
+import com.example.projemanaj.firebase.FirestoreClass
+import com.example.projemanaj.models.Board
 import com.example.projemanaj.utils.Constants
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import java.io.IOException
 
-class CreateBoardActivity : AppCompatActivity() {
+class CreateBoardActivity : BaseActivity() {
 
     // variable storing the uri of the selected image
     private var mSelectedImageFileUri : Uri? = null
+
+    private var mBoardImageURL : String = ""
+
+    private lateinit var mUserName: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +46,9 @@ class CreateBoardActivity : AppCompatActivity() {
 
         setupActionBar()
 
+        if (intent.hasExtra(Constants.NAME)) {
+            mUserName = intent.getStringExtra(Constants.NAME)!!
+        }
 
         // setting up the click listener on the image so to change if we want
         findViewById<ImageView>(R.id.iv_board_image).setOnClickListener{
@@ -55,6 +69,16 @@ class CreateBoardActivity : AppCompatActivity() {
             }
         }
 
+        findViewById<Button>(R.id.btn_create).setOnClickListener(){
+            if(mSelectedImageFileUri != null){
+                uploadBoardImage()
+            }
+            else{
+                showProgressDialog(resources.getString(R.string.please_wait))
+                createBoard()
+            }
+        }
+
     }
 
     private fun setupActionBar(){
@@ -68,6 +92,74 @@ class CreateBoardActivity : AppCompatActivity() {
         }
         toolbar.setNavigationOnClickListener { onBackPressed() }
     }
+
+
+    private fun createBoard(){
+        val assignedUsersArrayList : ArrayList<String> = ArrayList()
+        assignedUsersArrayList.add(getCurrentUserID())
+
+        var board = Board(
+            findViewById<TextView>(R.id.et_board_name).toString(),
+            mBoardImageURL,
+            mUserName,
+            assignedUsersArrayList
+        )
+
+        FirestoreClass().createBoard(this,board)
+    }
+
+    fun boardCreatedSuccessfully(){
+        hideProgressDialog()
+        finish()
+    }
+
+    // function to upload image to the firebase storage
+    private fun uploadBoardImage(){
+        // first show progress dialog
+        showProgressDialog(resources.getString(R.string.please_wait))
+
+        // push file into the storage
+        if(mSelectedImageFileUri != null){
+
+            // generic code for storing file to the storage
+            val sRef : StorageReference =
+                FirebaseStorage.getInstance().reference
+                    // getFileExtension used here
+                    .child("BOARD_IMAGE" + System.currentTimeMillis()
+                            + "." + Constants.getFileExtension(mSelectedImageFileUri,this@CreateBoardActivity))
+
+            // Put the file in storage and then work on it's success and failure listener
+            sRef.putFile(mSelectedImageFileUri!!)
+
+                // if file loaded to the storage
+                .addOnSuccessListener {
+
+                    // log message
+                    Log.i("Firebase Board Image Url",
+                        it.metadata!!.reference!!.downloadUrl.toString())
+
+                    // now we will call update Profile data
+                    it.metadata!!.reference!!.downloadUrl.addOnSuccessListener {
+
+                        // file url copied to local for further update in the firebase cloud
+                        mBoardImageURL = it.toString()
+
+                        // now we have all updated data with us so we can call this function
+                        createBoard()
+                    }
+                }
+
+                // if the file not loaded then show exception
+                .addOnFailureListener{
+                    Toast.makeText(
+                        this,
+                        "file not loaded to the firebase storage",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+        }
+    }
+
 
     // function to get the permission result
     override fun onRequestPermissionsResult(

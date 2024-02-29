@@ -4,6 +4,7 @@ import android.app.Activity
 import android.util.Log
 import android.widget.Toast
 import com.example.projemanaj.activities.*
+import com.example.projemanaj.models.Board
 import com.example.projemanaj.models.User
 import com.example.projemanaj.utils.Constants
 import com.google.firebase.auth.FirebaseAuth
@@ -93,6 +94,18 @@ class FirestoreClass {
             .addOnFailureListener { e ->
                 activity.hideProgressDialog()
                 Toast.makeText(activity,"Profile not updated ", Toast.LENGTH_LONG).show()
+            }
+    }
+
+
+    fun createBoard(activity : CreateBoardActivity,board: Board){
+        mFireStore.collection(Constants.BOARD)
+            .document()
+            .set(board,SetOptions.merge())
+            .addOnSuccessListener {
+                Toast.makeText(activity,
+                    "Board created successfully",Toast.LENGTH_SHORT).show()
+                activity.boardCreatedSuccessfully()
             }
     }
 

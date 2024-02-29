@@ -74,6 +74,11 @@ open class BaseActivity : AppCompatActivity() {
         snackBarView.setBackgroundColor(ContextCompat.getColor(this,R.color.snackbar_error_color))
         snackBar.show()
     }
+
+    fun getCurrentUserID(): String {
+        return FirebaseAuth.getInstance().currentUser!!.uid
+    }
+
 }
 
 // At end ensure that all the activities are inheriting Base activity

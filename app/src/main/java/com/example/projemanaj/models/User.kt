@@ -13,3 +13,11 @@ data class User(
     val mobile : Long = 0,
     val fcmToken : String = ""
 ) : Parcelable
+
+@Parcelize
+data class Board(
+    val name : String = "",
+    val image : String = "",
+    val createdBy : String = "",
+    val assignedTo : ArrayList<String> = ArrayList()
+) : Parcelable

@@ -19,6 +19,7 @@ import com.bumptech.glide.Glide
 import com.example.projemanaj.R
 import com.example.projemanaj.firebase.FirestoreClass
 import com.example.projemanaj.models.User
+import com.example.projemanaj.utils.Constants
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
@@ -28,6 +29,8 @@ import com.google.firebase.auth.FirebaseAuth
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private var doubleBackToSignOutPressedOnce = false
+
+    private lateinit var mUserName : String
 
     // this object used in the startActivityForResult
     companion object{
@@ -48,7 +51,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         FirestoreClass().signInRegisteredUser(this@MainActivity)
 
         findViewById<FloatingActionButton>(R.id.fab_create_board).setOnClickListener{
-            startActivity(Intent(this@MainActivity, CreateBoardActivity::class.java))
+            val intent = Intent(this@MainActivity,CreateBoardActivity::class.java)
+            intent.putExtra(Constants.NAME, mUserName)
+            startActivity(intent)
         }
     }
 
@@ -139,6 +144,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     // This function is called in the Firestore Class in signInRegisterUser method to display user's data on NavDrawer
     fun updateNavigationUserDetails(user : User){
+        mUserName = user.name
         // We will be using Glide library to uploading the image
         Glide.with(this)
             .load(user.image)
