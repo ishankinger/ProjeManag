@@ -75,6 +75,7 @@ open class BaseActivity : AppCompatActivity() {
         snackBar.show()
     }
 
+    // function to return the current user id ( uid of the firebase )
     fun getCurrentUserID(): String {
         return FirebaseAuth.getInstance().currentUser!!.uid
     }

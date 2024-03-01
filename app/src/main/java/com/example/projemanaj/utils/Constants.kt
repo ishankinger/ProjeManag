@@ -15,8 +15,11 @@ object Constants{
     const val NAME : String = "name"
     const val MOBILE : String = "mobile"
     const val BOARD : String = "board"
+    const val ASSIGNED_TO = "assignedTo"
     const val READ_STORAGE_PERMISSION_CODE = 1
     const val PICK_IMAGE_REQUEST_CODE = 2
+
+    // These two functions are used without any change in different activities so we put it in constants
 
     // Function to choose image from our device after permission is granted
     fun showImageChooser(activity: Activity){

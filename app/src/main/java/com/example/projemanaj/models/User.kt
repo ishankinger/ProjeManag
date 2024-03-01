@@ -14,10 +14,12 @@ data class User(
     val fcmToken : String = ""
 ) : Parcelable
 
+// This is the local variable to store the information of the board for a particular user
 @Parcelize
 data class Board(
     val name : String = "",
     val image : String = "",
     val createdBy : String = "",
-    val assignedTo : ArrayList<String> = ArrayList()
+    val assignedTo : ArrayList<String> = ArrayList(),
+    var documentId : String = ""
 ) : Parcelable

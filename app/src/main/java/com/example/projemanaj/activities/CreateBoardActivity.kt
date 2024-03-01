@@ -10,9 +10,11 @@ import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -30,8 +32,10 @@ class CreateBoardActivity : BaseActivity() {
     // variable storing the uri of the selected image
     private var mSelectedImageFileUri : Uri? = null
 
+    // variable storing the url of the selected image
     private var mBoardImageURL : String = ""
 
+    // variable for storing the user name of the user who has created the board which should be filled
     private lateinit var mUserName: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,13 +43,16 @@ class CreateBoardActivity : BaseActivity() {
 
         setContentView(R.layout.activity_create_board)
 
+        // to hide the status bar
         window.setFlags(
             WindowManager.LayoutParams.FLAG_FULLSCREEN,
             WindowManager.LayoutParams.FLAG_FULLSCREEN
         )
 
+        // call setup action bar function
         setupActionBar()
 
+        // getting the userName from the intent of navigation from main activity to createBoard activity
         if (intent.hasExtra(Constants.NAME)) {
             mUserName = intent.getStringExtra(Constants.NAME)!!
         }
@@ -69,10 +76,15 @@ class CreateBoardActivity : BaseActivity() {
             }
         }
 
+        // click listener for create button
         findViewById<Button>(R.id.btn_create).setOnClickListener(){
+
+            // if chosen image is null means nothing is chosen then call upload image function
+            // inside uploadBoardImage function, create board function will be called
             if(mSelectedImageFileUri != null){
                 uploadBoardImage()
             }
+            // else directly call create Board function
             else{
                 showProgressDialog(resources.getString(R.string.please_wait))
                 createBoard()
@@ -81,6 +93,7 @@ class CreateBoardActivity : BaseActivity() {
 
     }
 
+    // function to setUp Action Bar ( navigating arrows and title of the screen )
     private fun setupActionBar(){
         val toolbar : Toolbar = findViewById(R.id.toolbar_create_board_activity)
         setSupportActionBar(toolbar)
@@ -93,24 +106,49 @@ class CreateBoardActivity : BaseActivity() {
         toolbar.setNavigationOnClickListener { onBackPressed() }
     }
 
+    // function to get the permission result
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ){
+        // this is the generic code for getting permission result
+        super.onRequestPermissionsResult(requestCode,permissions,grantResults)
+        if(requestCode == Constants.READ_STORAGE_PERMISSION_CODE){
+            // if we get the permission then we can call show image chooser function
+            if(grantResults.isNotEmpty()){
+                // using the imageChooser function present in the Constants
+                Constants.showImageChooser(this@CreateBoardActivity)
 
-    private fun createBoard(){
-        val assignedUsersArrayList : ArrayList<String> = ArrayList()
-        assignedUsersArrayList.add(getCurrentUserID())
-
-        var board = Board(
-            findViewById<TextView>(R.id.et_board_name).toString(),
-            mBoardImageURL,
-            mUserName,
-            assignedUsersArrayList
-        )
-
-        FirestoreClass().createBoard(this,board)
+                // else we will give a toast saying permission denied
+            }else{
+                Toast.makeText(
+                    this,
+                    "Oops, you just denied the permission for storage.",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
     }
 
-    fun boardCreatedSuccessfully(){
-        hideProgressDialog()
-        finish()
+    // Generic code for updating the image on the image view after choosing image from device
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(resultCode == Activity.RESULT_OK
+            && requestCode == Constants.PICK_IMAGE_REQUEST_CODE
+            && data!!.data != null){
+            mSelectedImageFileUri = data.data
+            try{
+                Glide.with(this@CreateBoardActivity)
+                    .load(mSelectedImageFileUri.toString())
+                    .centerCrop()
+                    .circleCrop()
+                    .placeholder(R.drawable.ic_board_place_holder)
+                    .into(findViewById(R.id.iv_board_image))
+            }catch(e: IOException){
+                e.printStackTrace()
+            }
+        }
     }
 
     // function to upload image to the firebase storage
@@ -124,7 +162,7 @@ class CreateBoardActivity : BaseActivity() {
             // generic code for storing file to the storage
             val sRef : StorageReference =
                 FirebaseStorage.getInstance().reference
-                    // getFileExtension used here
+                    // getFileExtension used here( from Constants )
                     .child("BOARD_IMAGE" + System.currentTimeMillis()
                             + "." + Constants.getFileExtension(mSelectedImageFileUri,this@CreateBoardActivity))
 
@@ -160,49 +198,27 @@ class CreateBoardActivity : BaseActivity() {
         }
     }
 
+    // function to create board, all the information of board will be filled and then call to firebase
+    private fun createBoard(){
+        val assignedUsersArrayList : ArrayList<String> = ArrayList()
+        assignedUsersArrayList.add(getCurrentUserID())
 
-    // function to get the permission result
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ){
-        // this is the generic code for getting permission result
-        super.onRequestPermissionsResult(requestCode,permissions,grantResults)
-        if(requestCode == Constants.READ_STORAGE_PERMISSION_CODE){
-            // if we get the permission then we can call show image chooser function
-            if(grantResults.isNotEmpty()){
-                Constants.showImageChooser(this@CreateBoardActivity)
+        // board variable ( combining all the information extracted )
+        var board = Board(
+            findViewById<AppCompatEditText>(R.id.et_board_name).text.toString(), // board name
+            mBoardImageURL,                                                      // image url
+            mUserName,                                                           // user name
+            assignedUsersArrayList                                               // assignedTo array list
+        )
 
-                // else we will give a toast saying permission denied
-            }else{
-                Toast.makeText(
-                    this,
-                    "Oops, you just denied the permission for storage.",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-        }
+        // calling firestore class create Board function to create board in the firebase
+        FirestoreClass().createBoard(this,board)
     }
 
-    // Generic code for updating the image on the image view after choosing image from device
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if(resultCode == Activity.RESULT_OK
-            && requestCode == Constants.PICK_IMAGE_REQUEST_CODE
-            && data!!.data != null){
-            mSelectedImageFileUri = data.data
-            try{
-                Glide.with(this@CreateBoardActivity)
-                    .load(mSelectedImageFileUri.toString())
-                    .centerCrop()
-                    .circleCrop()
-                    .placeholder(R.drawable.ic_board_place_holder)
-                    .into(findViewById(R.id.iv_board_image))
-            }catch(e: IOException){
-                e.printStackTrace()
-            }
-        }
+    // at last board is stored in the firebase document and hide progress dialog and finish
+    fun boardCreatedSuccessfully(){
+        hideProgressDialog()
+        finish()
     }
 
 }

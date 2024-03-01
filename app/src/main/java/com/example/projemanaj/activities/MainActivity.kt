@@ -1,5 +1,6 @@
 package com.example.projemanaj.activities
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -7,6 +8,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.text.Layout
 import android.view.MenuItem
+import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -15,9 +17,13 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.os.postDelayed
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.projemanaj.R
+import com.example.projemanaj.adapters.BoardItemAdapter
 import com.example.projemanaj.firebase.FirestoreClass
+import com.example.projemanaj.models.Board
 import com.example.projemanaj.models.User
 import com.example.projemanaj.utils.Constants
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -48,10 +54,14 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
         // when main activity is created then we will call this function of firestroe class
         // this function will help in updating the data in nav drawer that is our name and image
-        FirestoreClass().signInRegisteredUser(this@MainActivity)
+        FirestoreClass().signInRegisteredUser(this@MainActivity,true)
 
+        // on click Listener for the floating button
         findViewById<FloatingActionButton>(R.id.fab_create_board).setOnClickListener{
+            // when we click on floating button two operations should be performed
+            // first is the navigation to create board activity
             val intent = Intent(this@MainActivity,CreateBoardActivity::class.java)
+            // second is the user name is also transferred to createBoard activity to fill information
             intent.putExtra(Constants.NAME, mUserName)
             startActivity(intent)
         }
@@ -143,7 +153,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     // This function is called in the Firestore Class in signInRegisterUser method to display user's data on NavDrawer
-    fun updateNavigationUserDetails(user : User){
+    fun updateNavigationUserDetails(user : User, readBoardList : Boolean){
         mUserName = user.name
         // We will be using Glide library to uploading the image
         Glide.with(this)
@@ -155,6 +165,12 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
         // also the name is also updated
         findViewById<TextView>(R.id.nav_username).text = user.name
+
+        //
+        if(readBoardList){
+            showProgressDialog(resources.getString(R.string.please_wait))
+            FirestoreClass().getBoardsList(this)
+        }
     }
 
     // when it returns to main activity from updating the data this function will be called and we will update the data of navDrawer
@@ -162,6 +178,27 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         super.onActivityResult(requestCode, resultCode, data)
         if(resultCode == Activity.RESULT_OK && requestCode == MY_PROFILE_REQUEST_CODE){
             FirestoreClass().signInRegisteredUser(this)
+        }
+    }
+
+    // function to show the board list to the main screen
+    @SuppressLint("CutPasteId")
+    fun populateBoardsListToUI(boardList : ArrayList<Board>){
+        // progress dialog is hide
+        hideProgressDialog()
+        // if boardList has some boards then
+        if(boardList.size > 0){
+            findViewById<RecyclerView>(R.id.rv_boards_list).visibility = View.VISIBLE
+            findViewById<TextView>(R.id.tv_no_boards_available).visibility = View.GONE
+            findViewById<RecyclerView>(R.id.rv_boards_list).layoutManager = LinearLayoutManager(this)
+            findViewById<RecyclerView>(R.id.rv_boards_list).setHasFixedSize(true)
+
+            val adapter = BoardItemAdapter(this,boardList)
+            findViewById<RecyclerView>(R.id.rv_boards_list).adapter = adapter
+        }
+        else{
+            findViewById<RecyclerView>(R.id.rv_boards_list).visibility = View.GONE
+            findViewById<TextView>(R.id.tv_no_boards_available).visibility = View.VISIBLE
         }
     }
 

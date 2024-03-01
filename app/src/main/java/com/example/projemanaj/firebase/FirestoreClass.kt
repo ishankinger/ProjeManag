@@ -39,7 +39,7 @@ class FirestoreClass {
     // this function will be called when user will click the signIn button in signIn activity
     // This function will help in getting user's information so is very useful for other activities also as we
     // want to update a lot of things in our app from user's information
-    fun signInRegisteredUser(activity : Activity){
+    fun signInRegisteredUser(activity : Activity, readBoardList : Boolean = false){
         // collection id name
         mFireStore.collection(Constants.USERS)
 
@@ -61,7 +61,7 @@ class FirestoreClass {
                     }
                     // in main activity we load user data to show in navDrawer
                     is MainActivity ->{
-                        activity.updateNavigationUserDetails(loggedInUser)
+                        activity.updateNavigationUserDetails(loggedInUser, readBoardList)
                     }
                     // in myProfileActivity we load user data to show on the screen
                     is MyProfileActivity ->{
@@ -98,10 +98,17 @@ class FirestoreClass {
     }
 
 
+    // function called when create button is clicked and all the information about the board is extracted
     fun createBoard(activity : CreateBoardActivity,board: Board){
+        // set the name to the collection id
         mFireStore.collection(Constants.BOARD)
+
             .document()
+
+            // set the board information to that document
             .set(board,SetOptions.merge())
+
+            // move to final successful function
             .addOnSuccessListener {
                 Toast.makeText(activity,
                     "Board created successfully",Toast.LENGTH_SHORT).show()
@@ -109,6 +116,25 @@ class FirestoreClass {
             }
     }
 
+    fun getBoardsList(activity : MainActivity){
+        mFireStore.collection(Constants.BOARD)
+            .whereArrayContains(Constants.ASSIGNED_TO, getCurrentUserID())
+            .get()
+            .addOnSuccessListener {
+                document ->
+                val boardList : ArrayList<Board> = ArrayList()
+                for(i in document.documents){
+                    val board = i.toObject(Board::class.java)!!
+                    board.documentId = i.id
+                    boardList.add(board)
+                }
+                activity.populateBoardsListToUI(boardList)
+            }
+            .addOnFailureListener{e->
+                activity.hideProgressDialog()
+                Log.e(activity.javaClass.simpleName,"Error while creating")
+            }
+    }
 
     // function will return the uid of the current user
     fun getCurrentUserID(): String{
