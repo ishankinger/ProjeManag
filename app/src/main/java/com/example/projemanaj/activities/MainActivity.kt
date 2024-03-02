@@ -213,6 +213,13 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             // then connecting the recycler view's adapter to adapter that we have made
             val adapter = BoardItemAdapter(this,boardList)
             findViewById<RecyclerView>(R.id.rv_boards_list).adapter = adapter
+
+            // adding the onclick listener to the boards
+            adapter.setOnClickListener(object : BoardItemAdapter.OnClickListener{
+                override fun onClick(position : Int, model : Board){
+                    startActivity(Intent(this@MainActivity,TaskListActivity::class.java))
+                }
+            })
         }
 
         // else if board list is empty
