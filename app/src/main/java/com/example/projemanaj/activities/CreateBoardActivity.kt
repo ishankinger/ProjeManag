@@ -27,6 +27,8 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import java.io.IOException
 
+// This activity is used to create boards for particular user and store them in fire store database
+
 class CreateBoardActivity : BaseActivity() {
 
     // variable storing the uri of the selected image
@@ -218,6 +220,8 @@ class CreateBoardActivity : BaseActivity() {
     // at last board is stored in the firebase document and hide progress dialog and finish
     fun boardCreatedSuccessfully(){
         hideProgressDialog()
+        // activity result set to RESULT_OK this will help in updating the board list just after adding the board on the screen
+        setResult(Activity.RESULT_OK)
         finish()
     }
 

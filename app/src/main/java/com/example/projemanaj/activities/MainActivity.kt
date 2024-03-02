@@ -36,11 +36,13 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     private var doubleBackToSignOutPressedOnce = false
 
+    // variable storing the user's name which is to be navigated to create board activity
     private lateinit var mUserName : String
 
     // this object used in the startActivityForResult
     companion object{
         const val MY_PROFILE_REQUEST_CODE : Int = 11
+        const val CREATE_BOARD_REQUEST_CODE : Int = 12
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,8 +54,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         // nav_view is nav Drawer's id of the main activity which is set to item selected listener
         findViewById<NavigationView>(R.id.nav_view).setNavigationItemSelectedListener(this)
 
-        // when main activity is created then we will call this function of firestroe class
+        // when main activity is created then we will call this function of fire store class
         // this function will help in updating the data in nav drawer that is our name and image
+        // also we are passing true means we want board list to be read
         FirestoreClass().signInRegisteredUser(this@MainActivity,true)
 
         // on click Listener for the floating button
@@ -63,7 +66,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             val intent = Intent(this@MainActivity,CreateBoardActivity::class.java)
             // second is the user name is also transferred to createBoard activity to fill information
             intent.putExtra(Constants.NAME, mUserName)
-            startActivity(intent)
+            startActivityForResult(intent,CREATE_BOARD_REQUEST_CODE)
         }
     }
 
@@ -152,9 +155,12 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         Handler().postDelayed({doubleBackToSignOutPressedOnce = false},4000)
     }
 
-    // This function is called in the Firestore Class in signInRegisterUser method to display user's data on NavDrawer
+    // This function is called in the Fire store Class in signInRegisterUser method to display user's data on NavDrawer
     fun updateNavigationUserDetails(user : User, readBoardList : Boolean){
+
+        // this userName will be navigated to create board activity that's why made
         mUserName = user.name
+
         // We will be using Glide library to uploading the image
         Glide.with(this)
             .load(user.image)
@@ -166,9 +172,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         // also the name is also updated
         findViewById<TextView>(R.id.nav_username).text = user.name
 
-        //
+        // if this is true then only we will show call board list again
         if(readBoardList){
-            showProgressDialog(resources.getString(R.string.please_wait))
+            showProgressDialog(" ")
             FirestoreClass().getBoardsList(this)
         }
     }
@@ -177,28 +183,46 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if(resultCode == Activity.RESULT_OK && requestCode == MY_PROFILE_REQUEST_CODE){
+            // here we will not pass true to read board list
             FirestoreClass().signInRegisteredUser(this)
+        }
+        // check for the result after returning from create board activity
+        else if(resultCode == Activity.RESULT_OK && requestCode == CREATE_BOARD_REQUEST_CODE){
+            FirestoreClass().getBoardsList(this)
         }
     }
 
     // function to show the board list to the main screen
     @SuppressLint("CutPasteId")
     fun populateBoardsListToUI(boardList : ArrayList<Board>){
+
         // progress dialog is hide
         hideProgressDialog()
+
         // if boardList has some boards then
         if(boardList.size > 0){
+
+            // show the boards recycler view and remove no_boards text from the screen
             findViewById<RecyclerView>(R.id.rv_boards_list).visibility = View.VISIBLE
             findViewById<TextView>(R.id.tv_no_boards_available).visibility = View.GONE
+
+            // making linear layout of recycler views
             findViewById<RecyclerView>(R.id.rv_boards_list).layoutManager = LinearLayoutManager(this)
             findViewById<RecyclerView>(R.id.rv_boards_list).setHasFixedSize(true)
 
+            // then connecting the recycler view's adapter to adapter that we have made
             val adapter = BoardItemAdapter(this,boardList)
             findViewById<RecyclerView>(R.id.rv_boards_list).adapter = adapter
         }
+
+        // else if board list is empty
         else{
+
+            // we will show no_boards text on the screen
             findViewById<RecyclerView>(R.id.rv_boards_list).visibility = View.GONE
+            findViewById<TextView>(R.id.tv_no_boards_available).text = resources.getString(R.string.no_boards_are_available)
             findViewById<TextView>(R.id.tv_no_boards_available).visibility = View.VISIBLE
+
         }
     }
 

@@ -60,6 +60,7 @@ class FirestoreClass {
                         activity.signInSuccess(loggedInUser)
                     }
                     // in main activity we load user data to show in navDrawer
+                    // also we are adding read Board List variable to check whether board list should be read or not
                     is MainActivity ->{
                         activity.updateNavigationUserDetails(loggedInUser, readBoardList)
                     }
@@ -103,6 +104,7 @@ class FirestoreClass {
         // set the name to the collection id
         mFireStore.collection(Constants.BOARD)
 
+            // any random name will be given
             .document()
 
             // set the board information to that document
@@ -116,20 +118,41 @@ class FirestoreClass {
             }
     }
 
+    // function to get the board list for a particular user so that we can display boards on main screen
     fun getBoardsList(activity : MainActivity){
+        // go to the collection of name board
         mFireStore.collection(Constants.BOARD)
+
+            // now we will use query and this is where fire store comes into play
+            // now we will take all boards whose assigned to is equal to uid of the user
             .whereArrayContains(Constants.ASSIGNED_TO, getCurrentUserID())
+
+            // we get all the boards assigned to this user
             .get()
+
+            // success listener of getting an array of boards assigned to the user uid
             .addOnSuccessListener {
+                // we get this document
                 document ->
+
+                // an empty board list is defined
                 val boardList : ArrayList<Board> = ArrayList()
+
+                // traverse in the document and add every single board to the board list
                 for(i in document.documents){
                     val board = i.toObject(Board::class.java)!!
+                    // this local board variable will also contain the document id
+                    // this is done to keep track of board id while in previous user object we know
+                    // it's id that is uid which we set by our own but for board we have set random id
                     board.documentId = i.id
                     boardList.add(board)
                 }
+
+                // call for populate function to show these boards on the main screen
                 activity.populateBoardsListToUI(boardList)
             }
+
+            // also add failure listener
             .addOnFailureListener{e->
                 activity.hideProgressDialog()
                 Log.e(activity.javaClass.simpleName,"Error while creating")

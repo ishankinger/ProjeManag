@@ -21,7 +21,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/progress_text_marginStart"
-        android:text="@string/please_wait"
         android:textColor="@color/primary_text_color"
         android:textSize="@dimen/progress_text_size"
         app:layout_constraintBottom_toBottomOf="parent"

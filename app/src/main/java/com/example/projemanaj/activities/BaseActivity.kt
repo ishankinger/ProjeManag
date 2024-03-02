@@ -31,6 +31,9 @@ open class BaseActivity : AppCompatActivity() {
         // set the screen content from a layout resource the resource will be inflated, adding all top-level views to the screen
         mProgressDialog.setContentView(R.layout.dialog_progress)
 
+        // setting up the text for dialog
+        mProgressDialog.findViewById<TextView>(R.id.tv_progress_text).text = text
+
          // This prevents the dialog from disappearing when clicked
         mProgressDialog.setCancelable(false)
 
