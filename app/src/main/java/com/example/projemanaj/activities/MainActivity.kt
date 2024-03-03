@@ -217,7 +217,12 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             // adding the onclick listener to the boards
             adapter.setOnClickListener(object : BoardItemAdapter.OnClickListener{
                 override fun onClick(position : Int, model : Board){
-                    startActivity(Intent(this@MainActivity,TaskListActivity::class.java))
+                    // navigating to the task list activity and also sharing the board's document id
+                    // this board document is stored while getting board list from fire store
+                    // this board document id will further help in getting information about particular board
+                    val intent = Intent(this@MainActivity,TaskListActivity::class.java)
+                    intent.putExtra(Constants.DOCUMENT_ID, model.documentId)
+                    startActivity(intent)
                 }
             })
         }

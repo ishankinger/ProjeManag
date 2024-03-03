@@ -159,6 +159,57 @@ class FirestoreClass {
             }
     }
 
+
+    // function to get the board details from a particular board using it's board document id
+    fun getBoardDetails(activity : TaskListActivity, boardDocumentId : String){
+        // go into the document of board
+        mFireStore.collection(Constants.BOARD)
+
+            // get the board of particular document id
+            .document(boardDocumentId)
+
+            // get the details of the board
+            .get()
+
+            // success listener if fetching details is successful
+            .addOnSuccessListener{
+                // this document contain all details
+                document->
+
+                // calling the board Details function which contain all details of the board
+                // also getting the document id filled in the board
+                val board = document.toObject(Board::class.java)!!
+                board.documentId = document.id
+                activity.boardDetails(board)
+            }
+
+            // failure listener for any error if occurs
+            .addOnFailureListener{
+                activity.hideProgressDialog()
+                Toast.makeText(activity,"Error occurs", Toast.LENGTH_LONG).show()
+            }
+    }
+
+    // function to update the task list in the fire store database
+    fun addUpdateTaskList(activity: TaskListActivity, board: Board){
+        // Hash Maps have to be created to update the data stored
+        val taskListHashMap = HashMap<String,Any>()
+        taskListHashMap[Constants.TASK_LIST] = board.taskList
+
+        // similar way of updating as done before
+        mFireStore.collection(Constants.BOARD)
+            .document(board.documentId)
+            .update(taskListHashMap)
+            .addOnSuccessListener{
+                // calling the addUpdate function of TaskList activity
+                activity.addUpdateTaskListSuccess()
+            }
+            .addOnFailureListener {
+                activity.hideProgressDialog()
+                Toast.makeText(activity,"Error updating task list",Toast.LENGTH_SHORT).show()
+            }
+    }
+
     // function will return the uid of the current user
     fun getCurrentUserID(): String{
         var currentUser = FirebaseAuth.getInstance().currentUser

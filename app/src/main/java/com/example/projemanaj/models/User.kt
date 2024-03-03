@@ -21,5 +21,13 @@ data class Board(
     val image : String = "",
     val createdBy : String = "",
     val assignedTo : ArrayList<String> = ArrayList(),
-    var documentId : String = ""
+    var documentId : String = "",
+    var taskList : ArrayList<Task> = ArrayList()
+) : Parcelable
+
+// This variable will store all the tasks contained by a particular board
+@Parcelize
+data class Task(
+    var title : String = "",
+    val createdBy : String = ""
 ) : Parcelable
