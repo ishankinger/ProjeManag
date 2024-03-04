@@ -96,6 +96,9 @@ class TaskListActivity : BaseActivity() {
 
         // adding the task list to the first of the array
         mBoardDetails.taskList.add(0, task)
+
+        // we have to remove the last task List that is add list as when we again call board details
+        // to show tasks then a new task of add list is pushed into the task list
         mBoardDetails.taskList.removeAt(mBoardDetails.taskList.size - 1)
 
         // now show progress dialog to update the tasks in the fire store database
@@ -111,9 +114,9 @@ class TaskListActivity : BaseActivity() {
         // getting the task name and uid of the user who has created it
         val task = Task(listName, model.createdBy)
 
-        //
+        // updating the task list at given position and removing add list from the end
         mBoardDetails.taskList[position] = task
-//        mBoardDetails.taskList.removeAt(mBoardDetails.taskList.size - 1)
+        mBoardDetails.taskList.removeAt(mBoardDetails.taskList.size - 1)
 
         // now show progress dialog to update the tasks in the fire store database
         showProgressDialog(resources.getString((R.string.please_wait)))
@@ -123,9 +126,12 @@ class TaskListActivity : BaseActivity() {
 
     }
 
+    // function to delete the task from the task list
     fun deleteTaskList(position: Int) {
+
+        // deleting the task of task list at given position and remove add list from the end
         mBoardDetails.taskList.removeAt(position)
-//        mBoardDetails.taskList.removeAt(mBoardDetails.taskList.size - 1)
+        mBoardDetails.taskList.removeAt(mBoardDetails.taskList.size - 1)
 
         // now show progress dialog to update the tasks in the fire store database
         showProgressDialog(resources.getString((R.string.please_wait)))

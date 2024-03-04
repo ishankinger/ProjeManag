@@ -33,68 +33,99 @@ open class TaskListItemAdapter(private val context : Context, private var list :
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        // getting the task according to the position
         val model = list[position]
+
         if(holder is MyViewHolder){
+
+            // setting the task list and add list text view
             if(position == list.size-1){
-                // this part is for adding the list
+                // last position should show add list text view so to add the list so it' visibility is Visible
                 holder.itemView.findViewById<MaterialTextView>(R.id.tv_add_task_list).visibility = View.VISIBLE
-                // this part shows other lists
+                holder.itemView.findViewById<CardView>(R.id.cv_add_task_list_name).visibility = View.GONE
+                // other than that all other things will be Gone
                 holder.itemView.findViewById<LinearLayout>(R.id.ll_task_item).visibility = View.GONE
             }
             else{
+                // if we are not on last position then reverse will occur and if cv_add_task list name is opened by clicking
+                // on the add list tv then that will also be gone
                 holder.itemView.findViewById<MaterialTextView>(R.id.tv_add_task_list).visibility = View.GONE
+                holder.itemView.findViewById<CardView>(R.id.cv_add_task_list_name).visibility = View.GONE
                 holder.itemView.findViewById<LinearLayout>(R.id.ll_task_item).visibility = View.VISIBLE
             }
 
+            // tasks title are allotted
             holder.itemView.findViewById<TextView>(R.id.tv_task_list_title).text = model.title
 
+            // click listener for add list text view
             holder.itemView.findViewById<MaterialTextView>(R.id.tv_add_task_list).setOnClickListener{
+                // text view of add list gone
                 holder.itemView.findViewById<MaterialTextView>(R.id.tv_add_task_list).visibility = View.GONE
+                // and edit text view card to be shown
                 holder.itemView.findViewById<CardView>(R.id.cv_add_task_list_name).visibility = View.VISIBLE
             }
 
+            // in add list for edit list name two buttons one is close
             holder.itemView.findViewById<ImageButton>(R.id.ib_close_list_name).setOnClickListener{
+                // 'add list' text visible
                 holder.itemView.findViewById<MaterialTextView>(R.id.tv_add_task_list).visibility = View.VISIBLE
+                // edit card view gone
                 holder.itemView.findViewById<CardView>(R.id.cv_add_task_list_name).visibility = View.GONE
             }
 
+            // click listener for done button means adding this list name to the tasks
             holder.itemView.findViewById<ImageButton>(R.id.ib_done_list_name).setOnClickListener{
-
+                // getting the list name
                 val listName = holder.itemView.findViewById<EditText>(R.id.et_task_list_name).text.toString()
+                // if list name is not empty then call task list activity function to further add this list using fire store class
                 if(listName.isNotEmpty()){
                     if(context is TaskListActivity){
                         context.createTaskList(listName)
                     }
                 }
+                // else we will give a toast saying enter the name
                 else{
                     Toast.makeText(context,"Please enter List Name", Toast.LENGTH_SHORT).show()
                 }
             }
 
+            // click listener for the image button of edit the title name
             holder.itemView.findViewById<ImageButton>(R.id.ib_edit_list_name).setOnClickListener{
+                // initially setting the data of edit text card's text as title of task
                 holder.itemView.findViewById<EditText>(R.id.et_edit_task_list_name).setText(model.title)
+                // title view visibility gone
                 holder.itemView.findViewById<LinearLayout>(R.id.ll_title_view).visibility = View.GONE
-                holder.itemView.findViewById<CardView>(R.id.cv_add_task_list_name).visibility = View.VISIBLE
+                // and edit text card visibility on
+                holder.itemView.findViewById<CardView>(R.id.cv_edit_task_list_name).visibility = View.VISIBLE
             }
 
+            // inside the card view the close button click listener
             holder.itemView.findViewById<ImageButton>(R.id.ib_close_editable_view).setOnClickListener{
+                // title view visibility on
                 holder.itemView.findViewById<LinearLayout>(R.id.ll_title_view).visibility = View.VISIBLE
+                // card view of edit text gone
                 holder.itemView.findViewById<CardView>(R.id.cv_edit_task_list_name).visibility = View.GONE
             }
 
+            // for done button means updating the task title
             holder.itemView.findViewById<ImageButton>(R.id.ib_done_edit_list_name).setOnClickListener{
+                // getting the new list name
                 val listName = holder.itemView.findViewById<EditText>(R.id.et_edit_task_list_name).text.toString()
+                // if not empty then call for update task list in the task list activity
                 if(listName.isNotEmpty()){
                     if(context is TaskListActivity){
                         context.updateTaskList(position,listName,model)
                     }
                 }
+                // else make toast of please enter the name
                 else{
                     Toast.makeText(context,"Please enter List Name", Toast.LENGTH_SHORT).show()
                 }
             }
 
+            // click listener for deleting the list
             holder.itemView.findViewById<ImageButton>(R.id.ib_delete_list).setOnClickListener{
+                // using alert dialog box to be verified
                 alertDialogForDeleteList(position,model.title)
             }
         }
