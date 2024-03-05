@@ -1,5 +1,6 @@
 package com.example.projemanaj.adapters
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.content.res.Resources
@@ -8,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.cardview.widget.CardView
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projemanaj.R
 import com.example.projemanaj.activities.TaskListActivity
@@ -32,6 +34,7 @@ open class TaskListItemAdapter(private val context : Context, private var list :
         return list.size
     }
 
+    @SuppressLint("CutPasteId")
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         // getting the task according to the position
         val model = list[position]
@@ -128,7 +131,48 @@ open class TaskListItemAdapter(private val context : Context, private var list :
                 // using alert dialog box to be verified
                 alertDialogForDeleteList(position,model.title)
             }
+
+            // click listener for the add card text
+            holder.itemView.findViewById<TextView>(R.id.tv_add_card).setOnClickListener{
+                // add card text view visibility gone
+                holder.itemView.findViewById<TextView>(R.id.tv_add_card).visibility = View.GONE
+                // and edit text visible
+                holder.itemView.findViewById<CardView>(R.id.cv_add_card).visibility = View.VISIBLE
+            }
+
+            // click listener for the close button in the edit text visible
+            holder.itemView.findViewById<ImageButton>(R.id.ib_close_card_name).setOnClickListener{
+                // add card visible
+                holder.itemView.findViewById<TextView>(R.id.tv_add_card).visibility = View.VISIBLE
+                // edit card visibility gone
+                holder.itemView.findViewById<CardView>(R.id.cv_add_card).visibility = View.GONE
+            }
+
+            // click listener for done button in card view for adding the card
+            holder.itemView.findViewById<ImageButton>(R.id.ib_done_card_name).setOnClickListener {
+                // get name of the card
+                val cardName = holder.itemView.findViewById<EditText>(R.id.et_card_name).text.toString()
+                // if card name is not empty add to the task list using the addCardToTaskList function
+                if(cardName.isNotEmpty()){
+                    if(context is TaskListActivity){
+                        context.addCardToTaskList(position,cardName)
+                    }
+                }
+                // else show toast for filling the card name to add it
+                else{
+                    Toast.makeText(context,"Please enter Card Name", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            // assigning the layout manager of the card list
+            holder.itemView.findViewById<RecyclerView>(R.id.rv_card_list).layoutManager = LinearLayoutManager(context)
+            holder.itemView.findViewById<RecyclerView>(R.id.rv_card_list).setHasFixedSize(true)
+
+            // connecting the adapter of the card lists with our card list adapter
+            val adapter = CardListItemsAdapter(context,model.cards)
+            holder.itemView.findViewById<RecyclerView>(R.id.rv_card_list).adapter = adapter
         }
+
     }
 
     private fun alertDialogForDeleteList(position: Int, title: String) {

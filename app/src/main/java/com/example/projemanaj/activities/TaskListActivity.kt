@@ -10,6 +10,7 @@ import com.example.projemanaj.R
 import com.example.projemanaj.adapters.TaskListItemAdapter
 import com.example.projemanaj.firebase.FirestoreClass
 import com.example.projemanaj.models.Board
+import com.example.projemanaj.models.Card
 import com.example.projemanaj.models.Task
 import com.example.projemanaj.utils.Constants
 
@@ -136,7 +137,42 @@ class TaskListActivity : BaseActivity() {
         // now show progress dialog to update the tasks in the fire store database
         showProgressDialog(resources.getString((R.string.please_wait)))
 
-        // calling firestore database function to update the task list
+        // calling fire store database function to update the task list
+        FirestoreClass().addUpdateTaskList(this@TaskListActivity, mBoardDetails)
+
+    }
+
+    // function to add card to the particular task
+    fun addCardToTaskList(position : Int, cardName : String){
+
+        // remove add list
+        mBoardDetails.taskList.removeAt(mBoardDetails.taskList.size - 1)
+
+        // a card can be assigned to multiple users so created array list for that
+        var cardAssignedUserList : ArrayList<String> = ArrayList()
+        // adding this user id to it
+        cardAssignedUserList.add(FirestoreClass().getCurrentUserID())
+
+        // making a new card
+        val card = Card(cardName,FirestoreClass().getCurrentUserID(),cardAssignedUserList)
+        // adding new card to cards List
+        val cardsList = mBoardDetails.taskList[position].cards
+        cardsList.add(card)
+
+        // updated task
+        val task = Task(
+            mBoardDetails.taskList[position].title,
+            mBoardDetails.taskList[position].createdBy,
+            cardsList
+        )
+
+        // updating old task with the new one
+        mBoardDetails.taskList[position] = task
+
+        // now show progress dialog to update the tasks in the fire store database
+        showProgressDialog(resources.getString((R.string.please_wait)))
+
+        // calling fire store database function to update the task list
         FirestoreClass().addUpdateTaskList(this@TaskListActivity, mBoardDetails)
 
     }

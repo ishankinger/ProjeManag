@@ -29,5 +29,14 @@ data class Board(
 @Parcelize
 data class Task(
     var title : String = "",
-    val createdBy : String = ""
+    val createdBy : String = "",
+    val cards : ArrayList<Card> = ArrayList()
+) : Parcelable
+
+//
+@Parcelize
+data class Card(
+    val name : String = "",
+    val createdBy : String = "",
+    val assignedTo : ArrayList<String> = ArrayList()
 ) : Parcelable
