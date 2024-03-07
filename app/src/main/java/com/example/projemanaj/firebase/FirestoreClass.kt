@@ -210,6 +210,27 @@ class FirestoreClass {
             }
     }
 
+    // function to get the list of the users from assigned list of the board which contains the user ids
+    // of all the persons who are assigned to a particular project
+    fun getAssignedMembersListDetails(activity : MembersActivity, assignedTo : ArrayList<String>){
+        mFireStore.collection(Constants.USERS)
+            .whereIn(Constants.ID, assignedTo)
+            .get()
+            .addOnSuccessListener{
+                document->
+                val userList : ArrayList<User> = ArrayList()
+                for(i in document.documents){
+                    val user = i.toObject(User::class.java)!!
+                    userList.add(user)
+                }
+                activity.setUpMembersList(userList)
+            }
+            .addOnFailureListener {
+                activity.hideProgressDialog()
+                Toast.makeText(activity,"Error updating member list",Toast.LENGTH_SHORT).show()
+            }
+    }
+
     // function will return the uid of the current user
     fun getCurrentUserID(): String{
         var currentUser = FirebaseAuth.getInstance().currentUser

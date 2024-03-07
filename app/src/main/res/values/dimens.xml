@@ -85,8 +85,6 @@
     <dimen name="item_card_members_text_size">14sp</dimen>
     <dimen name="members_content_padding">16dp</dimen>
     <dimen name="members_cv_marginTop">5dp</dimen>
-    <dimen name="members_content_padding" tools:ignore="DuplicateDefinition">16dp</dimen>
-    <dimen name="members_cv_marginTop" tools:ignore="DuplicateDefinition">5dp</dimen>
     <dimen name="item_member_marginBottom">10dp</dimen>
     <dimen name="item_member_content_padding">10dp</dimen>
     <dimen name="item_member_member_image_size">60dp</dimen>
