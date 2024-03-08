@@ -45,11 +45,6 @@ class CreateBoardActivity : BaseActivity() {
 
         setContentView(R.layout.activity_create_board)
 
-        // to hide the status bar
-        window.setFlags(
-            WindowManager.LayoutParams.FLAG_FULLSCREEN,
-            WindowManager.LayoutParams.FLAG_FULLSCREEN
-        )
 
         // call setup action bar function
         setupActionBar()

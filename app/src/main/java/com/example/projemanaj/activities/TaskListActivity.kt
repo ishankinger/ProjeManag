@@ -1,6 +1,7 @@
 package com.example.projemanaj.activities
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -22,21 +23,29 @@ class TaskListActivity : BaseActivity() {
     // variable to store the board details
     private lateinit var mBoardDetails: Board
 
+    // variable to store the board's document id
+    private lateinit var mBoardDocumentId : String
+
+    // for activity result, used in sharing intent
+    companion object{
+        const val MEMBERS_REQUEST_CODE : Int = 13
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_task_list)
 
         // getting the document id for a particular board from the share intent coming from main activity
-        var boardDocumentId = ""
+        mBoardDocumentId = ""
         if (intent.hasExtra(Constants.DOCUMENT_ID)) {
-            boardDocumentId = intent.getStringExtra(Constants.DOCUMENT_ID).toString()
+            mBoardDocumentId = intent.getStringExtra(Constants.DOCUMENT_ID).toString()
         }
 
         // showing progress dialog as we are calling a fire store function further
         showProgressDialog(resources.getString(R.string.please_wait))
 
         // calling the fire store class function to get details of the board using it's document id
-        FirestoreClass().getBoardDetails(this, boardDocumentId)
+        FirestoreClass().getBoardDetails(this, mBoardDocumentId)
     }
 
     // function to set up the action bar
@@ -54,17 +63,23 @@ class TaskListActivity : BaseActivity() {
         toolbar.setNavigationOnClickListener { onBackPressed() }
     }
 
+    // function to create menu and inflate it to our given layout menu
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_members,menu)
         return super.onCreateOptionsMenu(menu)
     }
 
+    // function to do further operations after pressing the menu items
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // when our add member button is clicked
         when(item.itemId){
             R.id.action_members->{
+                // navigating to members activity with board's details as sharing input extra
                 val intent = Intent(this,MembersActivity::class.java)
                 intent.putExtra(Constants.BOARD_DETAIL,mBoardDetails)
-                startActivity(intent)
+                // also adding the activity for result code
+                startActivityForResult(intent,MEMBERS_REQUEST_CODE)
+                return true
             }
         }
         return super.onOptionsItemSelected(item)
@@ -194,5 +209,16 @@ class TaskListActivity : BaseActivity() {
         // calling fire store database function to update the task list
         FirestoreClass().addUpdateTaskList(this@TaskListActivity, mBoardDetails)
 
+    }
+
+    // function to get the activity result
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        // this is done for loading the board details again as if we add new member and he has done any changes
+        // and when we go back to screen we will not be able to see that changes
+        if(resultCode == Activity.RESULT_OK && requestCode == MEMBERS_REQUEST_CODE){
+            showProgressDialog(resources.getString(R.string.please_wait))
+            FirestoreClass().getBoardDetails(this,mBoardDocumentId)
+        }
     }
 }

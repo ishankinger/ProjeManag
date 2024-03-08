@@ -213,18 +213,92 @@ class FirestoreClass {
     // function to get the list of the users from assigned list of the board which contains the user ids
     // of all the persons who are assigned to a particular project
     fun getAssignedMembersListDetails(activity : MembersActivity, assignedTo : ArrayList<String>){
+        // we will go in users document as we want to get user details
         mFireStore.collection(Constants.USERS)
+
+            // all the users having id equal to any id's of assigned to list will be added
             .whereIn(Constants.ID, assignedTo)
             .get()
+
+            // if fetching is successful then
             .addOnSuccessListener{
+                // the list of users is stored in this document variable
                 document->
+                // an empty user list created which we will return further
                 val userList : ArrayList<User> = ArrayList()
+                // traversing in the document
                 for(i in document.documents){
+                    // adding the user to the userList
                     val user = i.toObject(User::class.java)!!
                     userList.add(user)
                 }
+                // and then calling setUpMember list function with userList as our output
                 activity.setUpMembersList(userList)
             }
+
+            // if failure occurs while fetching the data
+            .addOnFailureListener {
+                activity.hideProgressDialog()
+                Toast.makeText(activity,"Error updating member list",Toast.LENGTH_SHORT).show()
+            }
+    }
+
+
+    // function to get the details of the member having the email id input to this function
+    fun getMemberDetails(activity : MembersActivity, email : String){
+        // going to the users document
+        mFireStore.collection(Constants.USERS)
+
+            // query of fire store to get all the users having this email
+            .whereEqualTo(Constants.EMAIL, email)
+            .get()
+
+            // if fetching is successful
+            .addOnSuccessListener {
+                // we get list of users having this email id
+                document->
+                // if not empty
+                if(document.documents.size > 0){
+                    // then get user ( here first user as we know that each user has a unique email id )
+                    val user = document.documents[0].toObject(User::class.java)!!
+                    // calling member details function giving output as user having this email
+                    activity.memberDetails(user)
+                }
+                // if no user of this email found show snack bar event
+                else{
+                    activity.hideProgressDialog()
+                    activity.showErrorSnackBar("No such member found")
+                }
+            }
+
+            // failure listener
+            .addOnFailureListener {
+                Toast.makeText(activity,"Error while getting user details",Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    // function to update the 'assigned to' list of the board
+    fun assignMemberToBoard(activity : MembersActivity, board: Board, user : User){
+        // to update we need to create a hash map
+        val assignedToHashMap = HashMap<String,Any>()
+        assignedToHashMap[Constants.ASSIGNED_TO] = board.assignedTo
+
+        // getting into the board
+        mFireStore.collection(Constants.BOARD)
+
+            // going in particular board
+            .document(board.documentId)
+
+            // updating it's list
+            .update(assignedToHashMap)
+
+            // add success listener to it
+            .addOnSuccessListener{
+                // calling memberAssigned success
+                activity.membersAssignedSuccess(user)
+            }
+
+            // add failure listener
             .addOnFailureListener {
                 activity.hideProgressDialog()
                 Toast.makeText(activity,"Error updating member list",Toast.LENGTH_SHORT).show()
