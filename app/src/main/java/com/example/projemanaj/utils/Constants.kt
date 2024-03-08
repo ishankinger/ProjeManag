@@ -23,6 +23,9 @@ object Constants{
     const val BOARD_DETAIL: String = "board_detail"
     const val ID : String = "id"
     const val EMAIL : String = "email"
+    const val TASK_LIST_ITEM_POSITION = "task_list_item_position"
+    const val CARD_LIST_ITEM_POSITION = "card_list_item_position"
+
     // These two functions are used without any change in different activities so we put it in constants
 
     // Function to choose image from our device after permission is granted

@@ -35,7 +35,7 @@ open class TaskListItemAdapter(private val context : Context, private var list :
     }
 
     @SuppressLint("CutPasteId")
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, @SuppressLint("RecyclerView") position: Int) {
         // getting the task according to the position
         val model = list[position]
 
@@ -171,8 +171,19 @@ open class TaskListItemAdapter(private val context : Context, private var list :
             // connecting the adapter of the card lists with our card list adapter
             val adapter = CardListItemsAdapter(context,model.cards)
             holder.itemView.findViewById<RecyclerView>(R.id.rv_card_list).adapter = adapter
-        }
 
+
+            adapter.setOnClickListener(
+                object : CardListItemsAdapter.OnClickListener{
+                    override fun onClick(cardPosition : Int){
+                        if(context is TaskListActivity){
+                            // calling the card details function with position of list and card position
+                            context.cardDetails(position, cardPosition)
+                        }
+                    }
+                }
+            )
+        }
     }
 
     private fun alertDialogForDeleteList(position: Int, title: String) {

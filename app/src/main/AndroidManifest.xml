@@ -18,6 +18,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ProjeManaj">
         <activity
+            android:name="com.example.projemanaj.activities.CardsDetailActivity"
+            android:exported="false"
+            android:screenOrientation="fullSensor"
+            android:theme="@style/Theme.ProjeManaj.NoActionBar" />
+        <activity
             android:name="com.example.projemanaj.activities.MembersActivity"
             android:exported="false"
             android:screenOrientation="fullSensor"

@@ -48,6 +48,15 @@ class TaskListActivity : BaseActivity() {
         FirestoreClass().getBoardDetails(this, mBoardDocumentId)
     }
 
+    // function to start the card details activity
+    fun cardDetails(taskListPosition : Int, cardListPosition : Int){
+        val intent = Intent(this,CardsDetailActivity::class.java)
+        intent.putExtra(Constants.BOARD_DETAIL, mBoardDetails)
+        intent.putExtra(Constants.TASK_LIST_ITEM_POSITION,taskListPosition)
+        intent.putExtra(Constants.CARD_LIST_ITEM_POSITION,cardListPosition)
+        startActivity(intent)
+    }
+
     // function to set up the action bar
     private fun setupActionBar() {
         val toolbar: Toolbar = findViewById(R.id.toolbar_task_list_activity)
