@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.widget.Toolbar
@@ -29,6 +30,7 @@ class TaskListActivity : BaseActivity() {
     // for activity result, used in sharing intent
     companion object{
         const val MEMBERS_REQUEST_CODE : Int = 13
+        const val CARD_DETAILS_REQUEST_CODE : Int = 14
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,13 +50,13 @@ class TaskListActivity : BaseActivity() {
         FirestoreClass().getBoardDetails(this, mBoardDocumentId)
     }
 
-    // function to start the card details activity
+    // function to start the card details activity ( called from the adapter of the taskListItemAdapter )
     fun cardDetails(taskListPosition : Int, cardListPosition : Int){
         val intent = Intent(this,CardsDetailActivity::class.java)
         intent.putExtra(Constants.BOARD_DETAIL, mBoardDetails)
         intent.putExtra(Constants.TASK_LIST_ITEM_POSITION,taskListPosition)
         intent.putExtra(Constants.CARD_LIST_ITEM_POSITION,cardListPosition)
-        startActivity(intent)
+        startActivityForResult(intent, CARD_DETAILS_REQUEST_CODE)
     }
 
     // function to set up the action bar
@@ -155,11 +157,8 @@ class TaskListActivity : BaseActivity() {
     // function called to update the tasks of a particular board
     fun updateTaskList(position: Int, listName: String, model: Task) {
 
-        // getting the task name and uid of the user who has created it
-        val task = Task(listName, model.createdBy)
-
-        // updating the task list at given position and removing add list from the end
-        mBoardDetails.taskList[position] = task
+        // updating the task list title at given position and removing 'add list' from the end
+        mBoardDetails.taskList[position].title = listName
         mBoardDetails.taskList.removeAt(mBoardDetails.taskList.size - 1)
 
         // now show progress dialog to update the tasks in the fire store database
@@ -223,11 +222,14 @@ class TaskListActivity : BaseActivity() {
     // function to get the activity result
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        // this is done for loading the board details again as if we add new member and he has done any changes
-        // and when we go back to screen we will not be able to see that changes
-        if(resultCode == Activity.RESULT_OK && requestCode == MEMBERS_REQUEST_CODE){
+        if (resultCode == Activity.RESULT_OK
+            && (requestCode == MEMBERS_REQUEST_CODE || requestCode == CARD_DETAILS_REQUEST_CODE)
+        ) {
+            // Show the progress dialog.
             showProgressDialog(resources.getString(R.string.please_wait))
-            FirestoreClass().getBoardDetails(this,mBoardDocumentId)
+            FirestoreClass().getBoardDetails(this@TaskListActivity, mBoardDocumentId)
+        } else {
+            Log.e("Cancelled", "Cancelled")
         }
     }
 }

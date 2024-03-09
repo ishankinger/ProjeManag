@@ -191,7 +191,7 @@ class FirestoreClass {
     }
 
     // function to update the task list in the fire store database
-    fun addUpdateTaskList(activity: TaskListActivity, board: Board){
+    fun addUpdateTaskList(activity: Activity, board: Board){
         // Hash Maps have to be created to update the data stored
         val taskListHashMap = HashMap<String,Any>()
         taskListHashMap[Constants.TASK_LIST] = board.taskList
@@ -201,12 +201,23 @@ class FirestoreClass {
             .document(board.documentId)
             .update(taskListHashMap)
             .addOnSuccessListener{
-                // calling the addUpdate function of TaskList activity
-                activity.addUpdateTaskListSuccess()
+                if(activity is TaskListActivity){
+                    // calling the addUpdate function of TaskList activity
+                    activity.addUpdateTaskListSuccess()
+                }
+                else if(activity is CardsDetailActivity){
+                    activity.addUpdateTaskListSuccess()
+                }
             }
             .addOnFailureListener {
-                activity.hideProgressDialog()
-                Toast.makeText(activity,"Error updating task list",Toast.LENGTH_SHORT).show()
+                if(activity is TaskListActivity){
+                    activity.hideProgressDialog()
+                    Toast.makeText(activity,"Error updating task list",Toast.LENGTH_SHORT).show()
+                }
+                else if(activity is CardsDetailActivity){
+                    activity.hideProgressDialog()
+                    Toast.makeText(activity,"Error updating task list",Toast.LENGTH_SHORT).show()
+                }
             }
     }
 
