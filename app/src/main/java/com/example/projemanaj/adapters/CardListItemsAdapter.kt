@@ -1,6 +1,7 @@
 package com.example.projemanaj.adapters
 
 import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,6 +37,19 @@ open class CardListItemsAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val model = list[position]
         if (holder is MyViewHolder) {
+
+            // if the labour color of the card is not empty then we will show the view with that color filled
+            if(model.labelColor.isNotEmpty()){
+                holder.itemView.findViewById<View>(R.id.view_label_color).visibility = View.VISIBLE
+                holder.itemView.findViewById<View>(R.id.view_label_color)
+                    .setBackgroundColor(Color.parseColor(model.labelColor))
+            }
+
+            // else it's visibility will be gone
+            else{
+                holder.itemView.findViewById<View>(R.id.view_label_color).visibility = View.GONE
+            }
+
             holder.itemView.setOnClickListener{
                 if(onClickListener != null){
                     onClickListener!!.onClick(position)

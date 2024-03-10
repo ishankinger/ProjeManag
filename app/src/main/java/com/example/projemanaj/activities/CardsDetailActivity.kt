@@ -2,15 +2,18 @@ package com.example.projemanaj.activities
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import com.example.projemanaj.R
+import com.example.projemanaj.dialog.LabelColorListDialog
 import com.example.projemanaj.firebase.FirestoreClass
 import com.example.projemanaj.models.Board
 import com.example.projemanaj.models.Card
@@ -22,6 +25,7 @@ class CardsDetailActivity : BaseActivity() {
     private lateinit var mBoardDetails : Board
     private var mTaskListPosition = -1
     private var mCardPosition = -1
+    private var mSelectedColor = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +42,12 @@ class CardsDetailActivity : BaseActivity() {
 
         setupActionBar()
 
+        // initialise the variable with initial value of the color
+        mSelectedColor = mBoardDetails.taskList[mTaskListPosition].cards[mCardPosition].labelColor
+        if(mSelectedColor.isNotEmpty()){
+            setColor()
+        }
+
         findViewById<Button>(R.id.btn_update_card_details).setOnClickListener {
             if(findViewById<EditText>(R.id.et_name_card_details).text.toString().isNotEmpty()){
                 updateCardDetails()
@@ -45,6 +55,11 @@ class CardsDetailActivity : BaseActivity() {
             else{
                 Toast.makeText(this@CardsDetailActivity,"Please enter a card name", Toast.LENGTH_SHORT).show()
             }
+        }
+
+        // setting on click listener for button to select the color
+        findViewById<TextView>(R.id.tv_select_label_color).setOnClickListener{
+            labelColorListDialog()
         }
     }
 
@@ -106,8 +121,8 @@ class CardsDetailActivity : BaseActivity() {
         val card = Card(
             findViewById<EditText>(R.id.et_name_card_details).text.toString(),
             mBoardDetails.taskList[mTaskListPosition].cards[mCardPosition].createdBy,
-            mBoardDetails.taskList[mTaskListPosition].cards[mCardPosition].assignedTo
-        )
+            mBoardDetails.taskList[mTaskListPosition].cards[mCardPosition].assignedTo,
+            mSelectedColor)
 
         mBoardDetails.taskList[mTaskListPosition].cards[mCardPosition] = card
 
@@ -158,6 +173,51 @@ class CardsDetailActivity : BaseActivity() {
         // Set other dialog properties
         alertDialog.setCancelable(false) // Will not allow user to cancel after clicking on remaining screen area.
         alertDialog.show()  // show the dialog to UI
+    }
+
+    // color list for the label color to be shown
+    private fun colorsList() : ArrayList<String>{
+        val colorsList : ArrayList<String> = ArrayList()
+        colorsList.add("#CAF0F8")
+        colorsList.add("#B1F2FF")
+        colorsList.add("#8AECFF")
+        colorsList.add("#63E5FF")
+        colorsList.add("#90E0EF")
+        colorsList.add("#00B7EB")
+        colorsList.add("#00B4D8")
+        colorsList.add("#0077B6")
+
+        return colorsList
+    }
+
+    // function to set up the color
+    private fun setColor(){
+        findViewById<TextView>(R.id.tv_select_label_color).text = ""
+        findViewById<TextView>(R.id.tv_select_label_color)
+            .setBackgroundColor(Color.parseColor(mSelectedColor))
+    }
+
+    // function to show the dialog of different colors
+    private fun labelColorListDialog(){
+        // getting the list of color from the color list function
+        val colorList : ArrayList<String> = colorsList()
+
+        // making a listDialog ( from label color list item adapter )
+        val listDialog = object : LabelColorListDialog(
+            this,
+            colorList,
+            resources.getString(R.string.str_select_label_color),
+            mSelectedColor){
+
+            // change mSelected Color to the color selected and then setColor function to change the color
+                override fun onItemSelected(color: String) {
+                    mSelectedColor = color
+                    setColor()
+                }
+        }
+
+        // showing the list dialog
+        listDialog.show()
     }
 
 }
