@@ -1,6 +1,7 @@
 package com.example.projemanaj.adapters
 
 import android.content.Context
+import android.opengl.Visibility
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,7 @@ import com.bumptech.glide.Glide
 import com.example.projemanaj.R
 import com.example.projemanaj.models.Card
 import com.example.projemanaj.models.User
+import com.example.projemanaj.utils.Constants
 
 open class MemberListItemAdapter(
     private val context: Context,
@@ -40,16 +42,40 @@ open class MemberListItemAdapter(
         val model = list[position]
         if (holder is MyViewHolder) {
 
+            // setting up the email and name of the user
             holder.itemView.findViewById<TextView>(R.id.tv_member_name).text = model.name
-
             holder.itemView.findViewById<TextView>(R.id.tv_member_email).text = model.email
 
+
+            // pushing the image of the member in the place holder
             Glide
                 .with(context)
                 .load(model.image)
                 .centerCrop()
                 .placeholder(R.drawable.ic_user_place_holder)
                 .into(holder.itemView.findViewById(R.id.iv_member_image))
+
+            // if selected then show it's image
+            if(model.selected){
+                holder.itemView.findViewById<ImageView>(R.id.iv_selected_member).visibility = View.VISIBLE
+            }
+            else{
+                holder.itemView.findViewById<ImageView>(R.id.iv_selected_member).visibility = View.GONE
+            }
+
+            // click listener for the members in the members list of card detail activity
+            holder.itemView.setOnClickListener{
+                if(onClickListener != null){
+                    // if user is selected then unselect it
+                    if(model.selected){
+                        onClickListener!!.onClick(position,model,Constants.UN_SELECT)
+                    }
+                    // if not selected then select it
+                    else{
+                        onClickListener!!.onClick(position,model,Constants.SELECT)
+                    }
+                }
+            }
         }
     }
 
@@ -68,7 +94,7 @@ open class MemberListItemAdapter(
 
     // An interface for onclick items.
     interface OnClickListener {
-        fun onClick(position: Int, card: Card)
+        fun onClick(position: Int, user : User, action : String)
     }
 
 

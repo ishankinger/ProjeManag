@@ -50,6 +50,7 @@ open class CardListItemsAdapter(
                 holder.itemView.findViewById<View>(R.id.view_label_color).visibility = View.GONE
             }
 
+            // click listener for the card
             holder.itemView.setOnClickListener{
                 if(onClickListener != null){
                     onClickListener!!.onClick(position)

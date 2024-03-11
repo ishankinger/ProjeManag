@@ -17,6 +17,7 @@ import com.example.projemanaj.firebase.FirestoreClass
 import com.example.projemanaj.models.Board
 import com.example.projemanaj.models.Card
 import com.example.projemanaj.models.Task
+import com.example.projemanaj.models.User
 import com.example.projemanaj.utils.Constants
 
 class TaskListActivity : BaseActivity() {
@@ -26,6 +27,9 @@ class TaskListActivity : BaseActivity() {
 
     // variable to store the board's document id
     private lateinit var mBoardDocumentId : String
+
+    // variable to store the members assigned to the board
+    private lateinit var mAssignedMemberDetailList : ArrayList<User>
 
     // for activity result, used in sharing intent
     companion object{
@@ -56,6 +60,7 @@ class TaskListActivity : BaseActivity() {
         intent.putExtra(Constants.BOARD_DETAIL, mBoardDetails)
         intent.putExtra(Constants.TASK_LIST_ITEM_POSITION,taskListPosition)
         intent.putExtra(Constants.CARD_LIST_ITEM_POSITION,cardListPosition)
+        intent.putExtra(Constants.BOARD_MEMBERS_LIST,mAssignedMemberDetailList)
         startActivityForResult(intent, CARD_DETAILS_REQUEST_CODE)
     }
 
@@ -121,6 +126,10 @@ class TaskListActivity : BaseActivity() {
         // attaching the Task List adapter to the ui and passing task list to the adapter
         val adapter = TaskListItemAdapter(this, board.taskList)
         findViewById<RecyclerView>(R.id.rv_task_list).adapter = adapter
+
+        // get the assigned member list from the fire store database function
+        showProgressDialog(resources.getString(R.string.please_wait))
+        FirestoreClass().getAssignedMembersListDetails(this@TaskListActivity,mBoardDetails.assignedTo)
 
     }
 
@@ -222,6 +231,7 @@ class TaskListActivity : BaseActivity() {
     // function to get the activity result
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        // to load the details again when returning from any activity back to task list activity
         if (resultCode == Activity.RESULT_OK
             && (requestCode == MEMBERS_REQUEST_CODE || requestCode == CARD_DETAILS_REQUEST_CODE)
         ) {
@@ -231,5 +241,13 @@ class TaskListActivity : BaseActivity() {
         } else {
             Log.e("Cancelled", "Cancelled")
         }
+    }
+
+    // function called from fire store function after getting user list assigned to the board
+    fun boardMembersDetailsList(list : ArrayList<User>){
+        // filling the value of the variable which will further be navigated to the cards detail activity
+        mAssignedMemberDetailList = list
+        // hide the progress dialog started
+        hideProgressDialog()
     }
 }

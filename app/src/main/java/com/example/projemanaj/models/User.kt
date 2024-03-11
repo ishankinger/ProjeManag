@@ -11,7 +11,8 @@ data class User(
     val email : String = "",
     val image : String = "",
     val mobile : Long = 0,
-    val fcmToken : String = ""
+    val fcmToken : String = "",
+    var selected : Boolean = false
 ) : Parcelable
 
 // This is the local variable to store the information of the board for a particular user
@@ -41,3 +42,9 @@ data class Card(
     val assignedTo : ArrayList<String> = ArrayList(),
     val labelColor : String = ""
 ) : Parcelable
+
+@Parcelize
+data class SelectedMembers(
+    val id : String = "",
+    val image : String = ""
+): Parcelable

@@ -25,6 +25,9 @@ object Constants{
     const val EMAIL : String = "email"
     const val TASK_LIST_ITEM_POSITION = "task_list_item_position"
     const val CARD_LIST_ITEM_POSITION = "card_list_item_position"
+    const val BOARD_MEMBERS_LIST : String = "board_members_list"
+    const val UN_SELECT : String = "UnSelect"
+    const val SELECT : String = "Select"
 
     // These two functions are used without any change in different activities so we put it in constants
 

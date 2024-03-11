@@ -223,7 +223,7 @@ class FirestoreClass {
 
     // function to get the list of the users from assigned list of the board which contains the user ids
     // of all the persons who are assigned to a particular project
-    fun getAssignedMembersListDetails(activity : MembersActivity, assignedTo : ArrayList<String>){
+    fun getAssignedMembersListDetails(activity : Activity, assignedTo : ArrayList<String>){
         // we will go in users document as we want to get user details
         mFireStore.collection(Constants.USERS)
 
@@ -243,14 +243,25 @@ class FirestoreClass {
                     val user = i.toObject(User::class.java)!!
                     userList.add(user)
                 }
-                // and then calling setUpMember list function with userList as our output
-                activity.setUpMembersList(userList)
+                if(activity is MembersActivity) {
+                    // and then calling setUpMember list function with userList as our output
+                    activity.setUpMembersList(userList)
+                }
+                else if(activity is TaskListActivity){
+                    activity.boardMembersDetailsList(userList)
+                }
             }
 
             // if failure occurs while fetching the data
             .addOnFailureListener {
-                activity.hideProgressDialog()
-                Toast.makeText(activity,"Error updating member list",Toast.LENGTH_SHORT).show()
+                if(activity is TaskListActivity){
+                    activity.hideProgressDialog()
+                    Toast.makeText(activity,"Error updating member list",Toast.LENGTH_SHORT).show()
+                }
+                else if(activity is MembersActivity){
+                    activity.hideProgressDialog()
+                    Toast.makeText(activity,"Error updating member list",Toast.LENGTH_SHORT).show()
+                }
             }
     }
 
