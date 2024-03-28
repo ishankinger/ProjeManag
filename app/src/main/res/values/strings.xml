@@ -39,4 +39,6 @@
     <string name="delete_card">Delete Card</string>
     <string name="str_select_label_color">Select Label Color</string>
     <string name="str_select_members">Select Members</string>
+    <string name="searchcard">searchCard</string>
+    <string name="name_board">Board Name</string>
 </resources>

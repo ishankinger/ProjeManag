@@ -7,12 +7,10 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.text.Layout
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.widget.Toolbar
 import androidx.core.os.postDelayed
 import androidx.core.view.GravityCompat
@@ -28,6 +26,7 @@ import com.example.projemanaj.models.User
 import com.example.projemanaj.utils.Constants
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
 
 // Main activity is divided into some ui parts. First is it's action bar , other is it's main content
@@ -43,6 +42,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     companion object{
         const val MY_PROFILE_REQUEST_CODE : Int = 11
         const val CREATE_BOARD_REQUEST_CODE : Int = 12
+        const val TASK_LIST_RETURN : Int = 20
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,6 +68,13 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             intent.putExtra(Constants.NAME, mUserName)
             startActivityForResult(intent,CREATE_BOARD_REQUEST_CODE)
         }
+//
+        //
+        findViewById<ImageView>(R.id.search_board_button).setOnClickListener {
+            // show progress dialog box
+            showProgressDialog(resources.getString(R.string.please_wait))
+            FirestoreClass().getBoardsList(this)
+        }
     }
 
     // This function will set up action bar and also contain the button to toggle the navDrawer
@@ -80,6 +87,28 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             toggleDrawer()
         }
     }
+
+    // function to create menu and inflate it to our given layout menu
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_search_board,menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    // function to do further operations after pressing the menu items
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // when our search board button is clicked
+        when(item.itemId){
+            R.id.action_delete_card->{
+
+                findViewById<TextInputLayout>(R.id.textInputLayout).visibility = View.VISIBLE
+                findViewById<ImageView>(R.id.search_board_button).visibility = View.VISIBLE
+                findViewById<TextView>(R.id.et_search_board).visibility = View.VISIBLE
+
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
 
     // function to get drawer out and display on the main activity
     private fun toggleDrawer(){
@@ -95,9 +124,20 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
     // This function is written so that when back button is pressed and nav drawer is opened then first the drawer should close
     // then call for doubleBackToExit function if again back button pressed
+    @SuppressLint("CutPasteId")
     override fun onBackPressed(){
         if(findViewById<DrawerLayout>(R.id.drawer_layout).isDrawerOpen(GravityCompat.START)){
             findViewById<DrawerLayout>(R.id.drawer_layout).closeDrawer(GravityCompat.START)
+        }
+        else if(findViewById<TextInputLayout>(R.id.textInputLayout).visibility == View.VISIBLE){
+
+            findViewById<TextInputLayout>(R.id.textInputLayout).visibility = View.GONE
+            findViewById<ImageView>(R.id.search_board_button).visibility = View.GONE
+            findViewById<TextView>(R.id.et_search_board).visibility = View.GONE
+            findViewById<TextView>(R.id.et_search_board).text = null
+
+            showProgressDialog(resources.getString(R.string.please_wait))
+            FirestoreClass().getBoardsList(this)
         }
         else{
             doubleBackToExit()
@@ -190,41 +230,88 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         else if(resultCode == Activity.RESULT_OK && requestCode == CREATE_BOARD_REQUEST_CODE){
             FirestoreClass().getBoardsList(this)
         }
+        else if(resultCode == Activity.RESULT_OK && requestCode == TASK_LIST_RETURN){
+            FirestoreClass().getBoardsList(this)
+        }
     }
 
     // function to show the board list to the main screen
     @SuppressLint("CutPasteId")
-    fun populateBoardsListToUI(boardList : ArrayList<Board>){
+    fun populateBoardsListToUI(boardsList : ArrayList<Board>){
 
         // progress dialog is hide
         hideProgressDialog()
 
         // if boardList has some boards then
-        if(boardList.size > 0){
+        if(boardsList.size > 0){
 
-            // show the boards recycler view and remove no_boards text from the screen
-            findViewById<RecyclerView>(R.id.rv_boards_list).visibility = View.VISIBLE
-            findViewById<TextView>(R.id.tv_no_boards_available).visibility = View.GONE
+//
+            var updatedBoardList = ArrayList<Board>()
+            //
+            if(findViewById<TextInputLayout>(R.id.textInputLayout).visibility == View.VISIBLE) {
 
-            // making linear layout of recycler views
-            findViewById<RecyclerView>(R.id.rv_boards_list).layoutManager = LinearLayoutManager(this)
-            findViewById<RecyclerView>(R.id.rv_boards_list).setHasFixedSize(true)
+                val searchBoardName: String = findViewById<TextView>(R.id.et_search_board).text.toString().trim { it <= ' ' }
 
-            // then connecting the recycler view's adapter to adapter that we have made
-            val adapter = BoardItemAdapter(this,boardList)
-            findViewById<RecyclerView>(R.id.rv_boards_list).adapter = adapter
+                if (searchBoardName.isNotEmpty()) {
 
-            // adding the onclick listener to the boards
-            adapter.setOnClickListener(object : BoardItemAdapter.OnClickListener{
-                override fun onClick(position : Int, model : Board){
-                    // navigating to the task list activity and also sharing the board's document id
-                    // this board document is stored while getting board list from fire store
-                    // this board document id will further help in getting information about particular board
-                    val intent = Intent(this@MainActivity,TaskListActivity::class.java)
-                    intent.putExtra(Constants.DOCUMENT_ID, model.documentId)
-                    startActivity(intent)
+                    for (board in boardsList) {
+                        var check = true
+                        val boardName = board.name
+                        for (i in searchBoardName.indices) {
+                            if (searchBoardName[i] != boardName[i]) {
+                                check = false
+                            }
+                        }
+                        if (check) {
+                            updatedBoardList.add(board)
+                        }
+                    }
                 }
-            })
+                else{
+                    updatedBoardList = boardsList
+                }
+            }
+            else{
+                updatedBoardList = boardsList
+            }
+
+            if(updatedBoardList.size == 0){
+                // we will show no_boards text on the screen
+                findViewById<RecyclerView>(R.id.rv_boards_list).visibility = View.GONE
+                findViewById<TextView>(R.id.tv_no_boards_available).text = resources.getString(R.string.no_boards_are_available)
+                findViewById<TextView>(R.id.tv_no_boards_available).visibility = View.VISIBLE
+            }
+            else{
+                val boardList = updatedBoardList
+
+                // show the boards recycler view and remove no_boards text from the screen
+                findViewById<RecyclerView>(R.id.rv_boards_list).visibility = View.VISIBLE
+                findViewById<TextView>(R.id.tv_no_boards_available).visibility = View.GONE
+
+                // making linear layout of recycler views
+                findViewById<RecyclerView>(R.id.rv_boards_list).layoutManager = LinearLayoutManager(this)
+                findViewById<RecyclerView>(R.id.rv_boards_list).setHasFixedSize(true)
+
+                // then connecting the recycler view's adapter to adapter that we have made
+                val adapter = BoardItemAdapter(this,boardList)
+                findViewById<RecyclerView>(R.id.rv_boards_list).adapter = adapter
+
+                // adding the onclick listener to the boards
+                adapter.setOnClickListener(object : BoardItemAdapter.OnClickListener{
+                    override fun onClick(position : Int, model : Board){
+                        // navigating to the task list activity and also sharing the board's document id
+                        // this board document is stored while getting board list from fire store
+                        // this board document id will further help in getting information about particular board
+                        findViewById<TextInputLayout>(R.id.textInputLayout).visibility = View.GONE
+                        findViewById<ImageView>(R.id.search_board_button).visibility = View.GONE
+                        findViewById<TextView>(R.id.et_search_board).visibility = View.GONE
+                        findViewById<TextView>(R.id.et_search_board).text = null
+                        val intent = Intent(this@MainActivity,TaskListActivity::class.java)
+                        intent.putExtra(Constants.DOCUMENT_ID, model.documentId)
+                        startActivityForResult(intent, TASK_LIST_RETURN)
+                    }
+                })
+            }
         }
 
         // else if board list is empty

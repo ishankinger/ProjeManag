@@ -341,7 +341,7 @@ class CardsDetailActivity : BaseActivity() {
             findViewById<RecyclerView>(R.id.rv_selected_members_list).visibility = View.VISIBLE
             findViewById<RecyclerView>(R.id.rv_selected_members_list).layoutManager = GridLayoutManager(this,5)
 
-            val adapter = CardMembersListItemAdapter(this,selectedMembersList)
+            val adapter = CardMembersListItemAdapter(this,true,selectedMembersList)
             findViewById<RecyclerView>(R.id.rv_selected_members_list).adapter = adapter
 
             adapter.setOnClickListener(

@@ -1,14 +1,18 @@
 package com.example.projemanaj.adapters
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projemanaj.R
+import com.example.projemanaj.activities.TaskListActivity
 import com.example.projemanaj.models.Card
+import com.example.projemanaj.models.SelectedMembers
 
 open class CardListItemsAdapter(
     private val context: Context,
@@ -34,7 +38,7 @@ open class CardListItemsAdapter(
     // Called when RecyclerView needs a new {@link ViewHolder} of the given type to represent an item.
     // This new ViewHolder should be constructed with a new View that can represent the items
     // of the given type. You can either create a new View manually or inflate it from an XML layout file.
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, @SuppressLint("RecyclerView") position: Int) {
         val model = list[position]
         if (holder is MyViewHolder) {
 
@@ -48,6 +52,43 @@ open class CardListItemsAdapter(
             // else it's visibility will be gone
             else{
                 holder.itemView.findViewById<View>(R.id.view_label_color).visibility = View.GONE
+            }
+
+            if((context as TaskListActivity).mAssignedMemberDetailList.size > 0){
+                val selectedMembersList : ArrayList<SelectedMembers> = ArrayList()
+                for(i in context.mAssignedMemberDetailList.indices){
+                    for(j in model.assignedTo){
+                        if(context.mAssignedMemberDetailList[i].id == j){
+                            val selectedMembers = SelectedMembers(
+                                context.mAssignedMemberDetailList[i].id,
+                                context.mAssignedMemberDetailList[i].image
+                            )
+                            selectedMembersList.add(selectedMembers)
+                        }
+                    }
+                }
+
+                if(selectedMembersList.size > 0){
+                    if(selectedMembersList.size == 1 && selectedMembersList[0].id == model.createdBy){
+                        holder.itemView.findViewById<RecyclerView>(R.id.rv_card_selected_members_list).visibility = View.GONE
+                    }
+                    else{
+                        holder.itemView.findViewById<RecyclerView>(R.id.rv_card_selected_members_list).visibility = View.VISIBLE
+                        holder.itemView.findViewById<RecyclerView>(R.id.rv_card_selected_members_list).layoutManager = GridLayoutManager(context,4)
+                        val adapter = CardMembersListItemAdapter(context,false,selectedMembersList)
+                        holder.itemView.findViewById<RecyclerView>(R.id.rv_card_selected_members_list).adapter = adapter
+                        adapter.setOnClickListener(object:CardMembersListItemAdapter.OnClickListener{
+                            override fun onClick(){
+                                if(onClickListener != null){
+                                    onClickListener!!.onClick(position)
+                                }
+                            }
+                        })
+                    }
+                }
+                else{
+                    holder.itemView.findViewById<RecyclerView>(R.id.rv_card_selected_members_list).visibility = View.GONE
+                }
             }
 
             // click listener for the card

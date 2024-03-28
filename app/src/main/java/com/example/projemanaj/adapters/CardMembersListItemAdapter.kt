@@ -12,6 +12,7 @@ import com.example.projemanaj.R
 import com.example.projemanaj.models.SelectedMembers
 
 open class CardMembersListItemAdapter(private val context : Context,
+                                      private val assignedMembers : Boolean,
                                       private val list : ArrayList<SelectedMembers>)
     : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
 
@@ -32,7 +33,7 @@ open class CardMembersListItemAdapter(private val context : Context,
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val model = list[position]
         if(holder is MyViewHolder){
-            if(position == list.size-1){
+            if(position == list.size-1 && assignedMembers){
                 holder.itemView.findViewById<ImageView>(R.id.iv_add_member).visibility = View.VISIBLE
                 holder.itemView.findViewById<ImageView>(R.id.iv_selected_member_image).visibility = View.GONE
             }

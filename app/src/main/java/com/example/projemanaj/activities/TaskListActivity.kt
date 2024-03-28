@@ -29,7 +29,7 @@ class TaskListActivity : BaseActivity() {
     private lateinit var mBoardDocumentId : String
 
     // variable to store the members assigned to the board
-    private lateinit var mAssignedMemberDetailList : ArrayList<User>
+    lateinit var mAssignedMemberDetailList : ArrayList<User>
 
     // for activity result, used in sharing intent
     companion object{
@@ -76,7 +76,11 @@ class TaskListActivity : BaseActivity() {
             actionBar.title = mBoardDetails.name
         }
 
-        toolbar.setNavigationOnClickListener { onBackPressed() }
+        toolbar.setNavigationOnClickListener {
+            setResult(Activity.RESULT_OK)
+            finish()
+            onBackPressed()
+        }
     }
 
     // function to create menu and inflate it to our given layout menu
@@ -113,19 +117,6 @@ class TaskListActivity : BaseActivity() {
 
         // calling set up action bar and using mBoard details to set it's title name
         setupActionBar()
-
-        // adding the first task as the add list button which will work to add another list
-        val addTaskList = Task(resources.getString(R.string.add_list))
-        board.taskList.add(addTaskList)
-
-        // setting the layout manager for rv_task_list as linear layout horizontal
-        findViewById<RecyclerView>(R.id.rv_task_list).layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        findViewById<RecyclerView>(R.id.rv_task_list).setHasFixedSize(true)
-
-        // attaching the Task List adapter to the ui and passing task list to the adapter
-        val adapter = TaskListItemAdapter(this, board.taskList)
-        findViewById<RecyclerView>(R.id.rv_task_list).adapter = adapter
 
         // get the assigned member list from the fire store database function
         showProgressDialog(resources.getString(R.string.please_wait))
@@ -244,10 +235,32 @@ class TaskListActivity : BaseActivity() {
     }
 
     // function called from fire store function after getting user list assigned to the board
+    @SuppressLint("CutPasteId")
     fun boardMembersDetailsList(list : ArrayList<User>){
         // filling the value of the variable which will further be navigated to the cards detail activity
         mAssignedMemberDetailList = list
         // hide the progress dialog started
         hideProgressDialog()
+
+        // cut and copy code here
+
+        // adding the first task as the add list button which will work to add another list
+        val addTaskList = Task(resources.getString(R.string.add_list))
+        mBoardDetails.taskList.add(addTaskList)
+
+        // setting the layout manager for rv_task_list as linear layout horizontal
+        findViewById<RecyclerView>(R.id.rv_task_list).layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        findViewById<RecyclerView>(R.id.rv_task_list).setHasFixedSize(true)
+
+        // attaching the Task List adapter to the ui and passing task list to the adapter
+        val adapter = TaskListItemAdapter(this, mBoardDetails.taskList)
+        findViewById<RecyclerView>(R.id.rv_task_list).adapter = adapter
+
+    }
+
+    override fun onBackPressed() {
+        setResult(Activity.RESULT_OK)
+        finish()
     }
 }
