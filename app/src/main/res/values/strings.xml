@@ -41,4 +41,9 @@
     <string name="str_select_members">Select Members</string>
     <string name="searchcard">searchCard</string>
     <string name="name_board">Board Name</string>
+    <string name="search_nb">Search</string>
+    <string name="settings_nb">Settings</string>
+    <string name="navigation_nb">Navigation</string>
+    <string name="add_nb">Add</string>
+    <string name="home">Home</string>
 </resources>

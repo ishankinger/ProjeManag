@@ -7,8 +7,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/ic_background"
-    android:gravity="center"
+    android:gravity="top"
     android:orientation="vertical"
     android:padding="@dimen/main_screen_content_padding"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
@@ -60,10 +59,8 @@
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/white"
-        android:elevation="@dimen/card_view_elevation"
-        app:cardCornerRadius="@dimen/card_view_corner_radius">
+        android:layout_height="580dp"
+        android:background="@android:color/white">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_boards_list"
@@ -79,6 +76,30 @@
             android:textColor="@color/secondary_text_color"
             android:textSize="@dimen/no_boards_available_text_size" />
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_create_board"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/fab_margin"
+            android:backgroundTint="@color/colorPrimaryDark"
+            app:srcCompat="@drawable/baseline_add_24" />
     </androidx.cardview.widget.CardView>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNaviagtionView"
+        android:layout_width="380dp"
+        android:layout_height="60dp"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="5dp"
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/my_navigation_items"
+        app:itemIconSize="30dp"
+        app:itemIconTint="@drawable/item_selector">
+
+    </com.google.android.material.bottomnavigation.BottomNavigationView>
+
+
 </LinearLayout>
+
     <!--END-->
